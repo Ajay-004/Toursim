@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourist Place Finder | Incredible India</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff6700;
+            --secondary-color: #046A38;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --white-color: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color); }
+
+        /* Navbar */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; background-color: var(--white-color); box-shadow: 0 2px 5px rgba(0,0,0,0.08); position: relative; z-index: 1001; }
+        .navbar .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+        .navbar .logo img { width: 40px; }
+        .navbar .logo h1 { font-size: 1.5rem; color: var(--primary-color); }
+        .navbar nav { display: flex; align-items: center; gap: 1rem; transition: all 0.3s ease; }
+        .navbar nav a { text-decoration: none; font-weight: 600; color: var(--text-color); }
+
+        /* Language Selector */
+        .language-selector { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; font-weight: 600; margin-left: 1rem; }
+        #language-select { padding: 0.3rem 0.5rem; border-radius: 5px; border: 1px solid #ccc; font-family: inherit; font-size: 0.8rem; }
+
+        /* Hamburger menu icon */
+        .menu-icon { display: none; flex-direction: column; justify-content: space-between; width: 28px; height: 22px; cursor: pointer; transition: all 0.3s ease; }
+        .menu-icon div { width: 100%; height: 3px; background-color: orange; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-icon.active div:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .menu-icon.active div:nth-child(2) { opacity: 0; }
+        .menu-icon.active div:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        /* Place Finder Section */
+        .finder-container { max-width: 900px; margin: 2rem auto; padding: 2rem; text-align: center; }
+        .finder-container h2 { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem; }
+        .finder-container p { font-size: 1.1rem; color: #555; margin-bottom: 2rem; }
+
+        #placeForm { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        /* Style adjustments for 3 inputs + button */
+        #placeForm > * { flex: 1 1 200px; }
+        #placeForm select, #placeForm input, #placeForm button {
+            padding: 0.8rem 1.5rem; font-size: 1rem; font-family: 'Poppins', sans-serif;
+            border: 1px solid #ccc; border-radius: 50px; margin-bottom: 0.5rem;
+        }
+        #placeForm select, #placeForm input { min-width: 150px; }
+        #placeForm select { background-color: white; }
+        #placeForm button { background-color: var(--primary-color); color: var(--white-color); border: none; cursor: pointer; font-weight: 600; flex-grow: 0; flex-shrink: 0; width: 100%; max-width: 200px; margin-left: auto; margin-right: auto;}
+        #district { opacity: 0.6; cursor: not-allowed; }
+        #district:not(:disabled) { opacity: 1; cursor: pointer; }
+
+        #place-results { min-height: 200px; max-height: 70vh; overflow-y: auto; padding-right: 0.5rem; text-align: left; }
+        #place-results .place-card {
+            background: var(--white-color); border-radius: 12px; box-shadow: var(--shadow);
+            padding: 1.5rem; margin-bottom: 1.5rem; animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0; color: #000; position: relative;
+        }
+        #place-results .place-card h4 { color: var(--secondary-color); font-size: 1.5rem; margin-bottom: 0.5rem; }
+        #place-results .place-card p { color: #000; margin-bottom: 0.5rem; }
+        #place-results .place-card ul { list-style: disc; padding-left: 20px; margin-top: 0.5rem; }
+        #place-results .place-card li { margin-bottom: 0.3rem; }
+        .distance-info { font-size: 0.9em; color: #555; margin-top: 1rem; border-top: 1px dashed #eee; padding-top: 0.5rem; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        #loadingSpinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 2rem auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+         /* --- Style for the coordinate warning message --- */
+        #coord-warning {
+            color: #d9534f;
+            background-color: #f2dede;
+            border: 1px solid #ebccd1;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 0.9em;
+            display: none; /* Hidden by default */
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) { /* Adjust breakpoint if needed */
+             #placeForm > * { flex-basis: 45%; }
+             #placeForm button { max-width: none; flex-basis: 100%;}
+        }
+        @media (max-width: 768px) {
+            .navbar nav {
+                display: none; position: absolute; top: 70px; /* Adjusted top value */ right: 5%; background: var(--white-color);
+                flex-direction: column; width: auto; min-width: 160px;
+                border-radius: 8px; box-shadow: var(--shadow); z-index: 1000;
+                padding: 1rem; align-items: flex-start;
+             }
+            .navbar nav.active { display: flex; }
+            .navbar nav a, .navbar nav .language-selector { margin: 0.5rem 0; width: 100%; }
+            .navbar nav .language-selector { justify-content: space-between; }
+            .menu-icon { display: flex; }
+            .finder-container { padding: 1rem; }
+            #placeForm { flex-direction: column; align-items: stretch; }
+            #placeForm > * { flex-basis: auto; }
+            #placeForm select, #placeForm input, #placeForm button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="index.html" class="logo">
+            <img src="https://img.icons8.com/color/48/lotus.png" alt="Logo">
+            <h1 data-i18n="app-title">Incredible India</h1>
+        </a>
+        <div class="menu-icon" id="menuIcon">
+            <div></div> <div></div> <div></div>
+        </div>
+        <nav id="navMenu">
+             <div class="language-selector">
+                <label for="language-select" data-i18n="lang-label">Language:</label>
+                <select id="language-select">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                    <option value="ml">മലയാളം (Malayalam)</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                    <option value="bn">বাংলা (Bengali)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                </select>
+            </div>
+            <a href="index.html" data-i18n="nav-home">Home</a>
+            <a href="map.html" data-i18n="nav-map">Map</a>
+            <a href="plan.html" data-i18n="nav-planner">AI Trip Planner</a>
+            
+        </nav>
+    </header>
+
+    <main class="finder-container">
+        <h2 data-i18n="finder-title">Tourist Place Finder</h2>
+        <p data-i18n="finder-subtitle">Explore amazing destinations across India. Select a state and district, and enter your starting location to find spots and distances.</p>
+
+        <form id="placeForm">
+            <select id="state" required>
+                <option value="" disabled selected data-i18n="select-state">Select a State</option>
+                 {/* Populated by JS */}
+            </select>
+            <select id="district" required disabled>
+                 <option value="" disabled selected data-i18n="select-district">Select a District</option>
+                 {/* Populated by JS */}
+            </select>
+            <input type="text" id="startLocation" placeholder="Your Starting Location (e.g., Chennai)" data-i18n-placeholder="placeholder-start-location" required>
+            <button type="submit" data-i18n="btn-find-places">Find Places</button>
+        </form>
+
+        <div id="coord-warning"></div>
+
+        <div id="place-results">
+             <div id="loadingSpinner" style="display:none;"></div>
+             <div id="results-content"></div>
+             <p id="placeholder-text" data-i18n="results-placeholder">Tourist spots will appear here...</p>
+        </div>
+    </main>
+
+    <script>
+        // --- State-District Data (IMPORTANT: Populate this fully for all states/UTs) ---
+        const stateDistrictData = {
+            "Andaman and Nicobar Islands": ["Nicobar", "North and Middle Andaman", "South Andaman"],
+            "Andhra Pradesh": ["Anantapur", "Chittoor", "East Godavari", "Guntur", "Krishna", "Kurnool", "Prakasam", "Srikakulam", "Sri Potti Sriramulu Nellore", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR District, Kadapa (Cuddapah)"],
+            "Arunachal Pradesh": ["Anjaw", "Changlang", "Dibang Valley", "East Kameng", "East Siang", "Kra Daadi", "Kurung Kumey", "Lohit", "Longding", "Lower Dibang Valley", "Lower Siang", "Lower Subansiri", "Namsai", "Papum Pare", "Siang", "Tawang", "Tirap", "Upper Siang", "Upper Subansiri", "West Kameng", "West Siang"],
+            "Assam": ["Baksa", "Barpeta", "Biswanath", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Dima Hasao (North Cachar Hills)", "Goalpara", "Golaghat", "Hailakandi", "Hojai", "Jorhat", "Kamrup", "Kamrup Metropolitan", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Majuli", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "South Salamara-Mankachar", "Tinsukia", "Udalguri", "West Karbi Anglong"],
+            "Bihar": ["Araria", "Arwal", "Aurangabad", "Banka", "Begusarai", "Bhagalpur", "Bhojpur", "Buxar", "Darbhanga", "East Champaran (Motihari)", "Gaya", "Gopalganj", "Jamui", "Jehanabad", "Kaimur (Bhabua)", "Katihar", "Khagaria", "Kishanganj", "Lakhisarai", "Madhepura", "Madhubani", "Munger (Monghyr)", "Muzaffarpur", "Nalanda", "Nawada", "Patna", "Purnia (Purnea)", "Rohtas", "Saharsa", "Samastipur", "Saran", "Sheikhpura", "Sheohar", "Sitamarhi", "Siwan", "Supaul", "Vaishali", "West Champaran"],
+            "Chandigarh": ["Chandigarh"],
+            "Chhattisgarh": ["Balod", "Baloda Bazar", "Balrampur", "Bastar", "Bemetara", "Bijapur", "Bilaspur", "Dantewada (South Bastar)", "Dhamtari", "Durg", "Gariyaband", "Janjgir-Champa", "Jashpur", "Kabirdham (Kawardha)", "Kanker (North Bastar)", "Kondagaon", "Korba", "Koriya", "Mahasamund", "Mungeli", "Narayanpur", "Raigarh", "Raipur", "Rajnandgaon", "Sukma", "Surajpur", "Surguja"],
+            "Dadra and Nagar Haveli and Daman and Diu": ["Dadra and Nagar Haveli", "Daman", "Diu"],
+            "Delhi": ["Central Delhi", "East Delhi", "New Delhi", "North Delhi", "North East Delhi", "North West Delhi", "Shahdara", "South Delhi", "South East Delhi", "South West Delhi", "West Delhi"],
+            "Goa": ["North Goa", "South Goa"],
+            "Gujarat": ["Ahmedabad", "Amreli", "Anand", "Aravalli", "Banaskantha (Palanpur)", "Bharuch", "Bhavnagar", "Botad", "Chhota Udepur", "Dahod", "Dang (Ahwa)", "Devbhoomi Dwarka", "Gandhinagar", "Gir Somnath", "Jamnagar", "Junagadh", "Kachchh", "Kheda (Nadiad)", "Mahisagar", "Mehsana", "Morbi", "Narmada (Rajpipla)", "Navsari", "Panchmahal (Godhra)", "Patan", "Porbandar", "Rajkot", "Sabarkantha (Himmatnagar)", "Surat", "Surendranagar", "Tapi (Vyara)", "Vadodara", "Valsad"],
+            "Haryana": ["Ambala", "Bhiwani", "Charkhi Dadri", "Faridabad", "Fatehabad", "Gurugram (Gurgaon)", "Hisar", "Jhajjar", "Jind", "Kaithal", "Karnal", "Kurukshetra", "Mahendragarh", "Nuh", "Palwal", "Panchkula", "Panipat", "Rewari", "Rohtak", "Sirsa", "Sonipat", "Yamunanagar"],
+            "Himachal Pradesh": ["Bilaspur", "Chamba", "Hamirpur", "Kangra", "Kinnaur", "Kullu", "Lahaul & Spiti", "Mandi", "Shimla", "Sirmaur (Sirmour)", "Solan", "Una"],
+            "Jammu and Kashmir": ["Anantnag", "Bandipore", "Baramulla", "Budgam", "Doda", "Ganderbal", "Jammu", "Kathua", "Kishtwar", "Kulgam", "Kupwara", "Poonch", "Pulwama", "Rajouri", "Ramban", "Reasi", "Samba", "Shopian", "Srinagar", "Udhampur"],
+            "Jharkhand": ["Bokaro", "Chatra", "Deoghar", "Dhanbad", "Dumka", "East Singhbhum", "Garhwa", "Giridih", "Godda", "Gumla", "Hazaribag", "Jamtara", "Khunti", "Koderma", "Latehar", "Lohardaga", "Pakur", "Palamu", "Ramgarh", "Ranchi", "Sahibganj", "Seraikela-Kharsawan", "Simdega", "West Singhbhum"],
+            "Karnataka": ["Bagalkot", "Ballari (Bellary)", "Belagavi (Belgaum)", "Bengaluru (Bangalore) Rural", "Bengaluru (Bangalore) Urban", "Bidar", "Chamarajanagar", "Chikballapur", "Chikkamagaluru (Chikmagalur)", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Hassan", "Haveri", "Kalaburagi (Gulbarga)", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru (Mysore)", "Raichur", "Ramanagara", "Shivamogga (Shimoga)", "Tumakuru (Tumkur)", "Udupi", "Uttara Kannada (Karwar)", "Vijayapura (Bijapur)", "Yadgir"],
+            "Kerala": ["Alappuzha", "Ernakulam", "Idukki", "Kannur", "Kasaragod", "Kollam", "Kottayam", "Kozhikode", "Malappuram", "Palakkad", "Pathanamthitta", "Thiruvananthapuram", "Thrissur", "Wayanad"],
+            "Ladakh": ["Kargil", "Leh"],
+            "Lakshadweep": ["Lakshadweep"],
+            "Madhya Pradesh": ["Agar Malwa", "Alirajpur", "Anuppur", "Ashoknagar", "Balaghat", "Barwani", "Betul", "Bhind", "Bhopal", "Burhanpur", "Chhatarpur", "Chhindwara", "Damoh", "Datia", "Dewas", "Dhar", "Dindori", "Guna", "Gwalior", "Harda", "Hoshangabad", "Indore", "Jabalpur", "Jhabua", "Katni", "Khandwa", "Khargone", "Mandla", "Mandsaur", "Morena", "Narsinghpur", "Neemuch", "Panna", "Raisen", "Rajgarh", "Ratlam", "Rewa", "Sagar", "Satna", "Sehore", "Seoni", "Shahdol", "Shajapur", "Sheopur", "Shivpuri", "Sidhi", "Singrauli", "Tikamgarh", "Ujjain", "Umaria", "Vidisha"],
+            "Maharashtra": ["Ahmednagar", "Akola", "Amravati", "Aurangabad (Chhatrapati Sambhajinagar)", "Beed", "Bhandara", "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Hingoli", "Jalgaon", "Jalna", "Kolhapur", "Latur", "Mumbai City", "Mumbai Suburban", "Nagpur", "Nanded", "Nandurbar", "Nashik", "Osmanabad", "Palghar", "Parbhani", "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara", "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"],
+            "Manipur": ["Bishnupur", "Chandel", "Churachandpur", "Imphal East", "Imphal West", "Jiribam", "Kakching", "Kamjong", "Kangpokpi", "Noney", "Pherzawl", "Senapati", "Tamenglong", "Tengnoupal", "Thoubal", "Ukhrul"],
+            "Meghalaya": ["East Garo Hills", "East Jaintia Hills", "East Khasi Hills", "North Garo Hills", "Ri Bhoi", "South Garo Hills", "South West Garo Hills", "South West Khasi Hills", "West Garo Hills", "West Jaintia Hills", "West Khasi Hills"],
+            "Mizoram": ["Aizawl", "Champhai", "Kolasib", "Lawngtlai", "Lunglei", "Mamit", "Saiha", "Serchhip"],
+            "Nagaland": ["Dimapur", "Kiphire", "Kohima", "Longleng", "Mokokchung", "Mon", "Peren", "Phek", "Tuensang", "Wokha", "Zunheboto"],
+            "Odisha": ["Angul", "Balangir", "Balasore", "Bargarh", "Bhadrak", "Boudh", "Cuttack", "Deogarh", "Dhenkanal", "Gajapati", "Ganjam", "Jagatsinghapur", "Jajpur", "Jharsuguda", "Kalahandi", "Kandhamal", "Kendrapara", "Kendujhar (Keonjhar)", "Khordha", "Koraput", "Malkangiri", "Mayurbhanj", "Nabarangpur", "Nayagarh", "Nuapada", "Puri", "Rayagada", "Sambalpur", "Sonepur", "Sundargarh"],
+            "Puducherry": ["Karaikal", "Mahe", "Puducherry", "Yanam"],
+            "Punjab": ["Amritsar", "Barnala", "Bathinda", "Faridkot", "Fatehgarh Sahib", "Fazilka", "Ferozepur", "Gurdaspur", "Hoshiarpur", "Jalandhar", "Kapurthala", "Ludhiana", "Mansa", "Moga", "Muktsar", "Nawanshahr (Shahid Bhagat Singh Nagar)", "Pathankot", "Patiala", "Rupnagar", "Sahibzada Ajit Singh Nagar (Mohali)", "Sangrur", "Tarn Taran"],
+            "Rajasthan": ["Ajmer", "Alwar", "Banswara", "Baran", "Barmer", "Bharatpur", "Bhilwara", "Bikaner", "Bundi", "Chittorgarh", "Churu", "Dausa", "Dholpur", "Dungarpur", "Hanumangarh", "Jaipur", "Jaisalmer", "Jalore", "Jhalawar", "Jhunjhunu", "Jodhpur", "Karauli", "Kota", "Nagaur", "Pali", "Pratapgarh", "Rajsamand", "Sawai Madhopur", "Sikar", "Sirohi", "Sri Ganganagar", "Tonk", "Udaipur"],
+            "Sikkim": ["East Sikkim", "North Sikkim", "South Sikkim", "West Sikkim"],
+            "Tamil Nadu": ["Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Kallakurichi", "Kancheepuram", "Kanyakumari", "Karur", "Krishnagiri", "Madurai", "Mayiladuthurai", "Nagapattinam", "Namakkal", "Nilgiris", "Perambalur", "Pudukkottai", "Ramanathapuram", "Ranipet", "Salem", "Sivaganga", "Tenkasi", "Thanjavur", "Theni", "Thoothukudi (Tuticorin)", "Tiruchirappalli", "Tirunelveli", "Tirupathur", "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Vellore", "Viluppuram", "Virudhunagar"],
+            "Telangana": ["Adilabad", "Bhadradri Kothagudem", "Hyderabad", "Jagtial", "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy", "Karimnagar", "Khammam", "Komaram Bheem Asifabad", "Mahabubabad", "Mahabubnagar", "Mancherial", "Medak", "Medchal-Malkajgiri", "Mulugu", "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad", "Peddapalli", "Rajanna Sircilla", "Rangareddy", "Sangareddy", "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal Rural", "Warangal Urban (Hanamkonda)", "Yadadri Bhuvanagiri"],
+            "Tripura": ["Dhalai", "Gomati", "Khowai", "North Tripura", "Sepahijala", "South Tripura", "Unakoti", "West Tripura"],
+            "Uttar Pradesh": ["Agra", "Aligarh", "Allahabad (Prayagraj)", "Ambedkar Nagar", "Amethi (Chatrapati Sahuji Mahraj Nagar)", "Amroha (J.P. Nagar)", "Auraiya", "Azamgarh", "Baghpat", "Bahraich", "Ballia", "Balrampur", "Banda", "Barabanki", "Bareilly", "Basti", "Bhadohi", "Bijnor", "Budaun", "Bulandshahr", "Chandauli", "Chitrakoot", "Deoria", "Etah", "Etawah", "Faizabad (Ayodhya)", "Farrukhabad", "Fatehpur", "Firozabad", "Gautam Buddha Nagar", "Ghaziabad", "Ghazipur", "Gonda", "Gorakhpur", "Hamirpur", "Hapur (Panchsheel Nagar)", "Hardoi", "Hathras", "Jalaun", "Jaunpur", "Jhansi", "Kannauj", "Kanpur Dehat", "Kanpur Nagar", "Kasganj (Kanshiram Nagar)", "Kaushambi", "Kushinagar (Padrauna)", "Lakhimpur - Kheri", "Lalitpur", "Lucknow", "Maharajganj", "Mahoba", "Mainpuri", "Mathura", "Mau", "Meerut", "Mirzapur", "Moradabad", "Muzaffarnagar", "Pilibhit", "Pratapgarh", "RaeBareli", "Rampur", "Saharanpur", "Sambhal (Bhim Nagar)", "Sant Kabir Nagar", "Shahjahanpur", "Shamali (Prabuddh Nagar)", "Shravasti", "Siddharth Nagar", "Sitapur", "Sonbhadra", "Sultanpur", "Unnao", "Varanasi"],
+            "Uttarakhand": ["Almora", "Bageshwar", "Chamoli", "Champawat", "Dehradun", "Haridwar", "Nainital", "Pauri Garhwal", "Pithoragarh", "Rudraprayag", "Tehri Garhwal", "Udham Singh Nagar", "Uttarkashi"],
+            "West Bengal": ["Alipurduar", "Bankura", "Birbhum", "Cooch Behar", "Dakshin Dinajpur (South Dinajpur)", "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia", "North 24 Parganas", "Paschim Medinipur (West Medinipur)", "Paschim (West) Burdwan", "Purba Medinipur (East Medinipur)", "Purba (East) Burdwan", "Purulia", "South 24 Parganas", "Uttar Dinajpur (North Dinajpur)"]
+        };
+
+        // --- Translation Data (Ensure all languages and keys are present) ---
+        const translations = {
+          en: {
+            'lang-label': 'Language:', 'app-title': 'Incredible India', 'nav-home': 'Home', 'nav-map': 'Map',
+            'nav-planner': 'AI Trip Planner', 'finder-title': 'Tourist Place Finder',
+            'finder-subtitle': 'Explore amazing destinations across India. Select a state and district, and enter your starting location to find spots and distances.',
+            'select-state': 'Select a State', 'select-district': 'Select a District',
+            // 'placeholder-location-optional': 'Optional: Near City/Place', // Removed
+            'placeholder-start-location': 'Your Starting Location (e.g., Chennai)',
+            'btn-find-places': 'Find Places',
+            'results-placeholder': 'Tourist spots will appear here...',
+            'error-select': 'Please select both a state and a district.',
+            'error-no-results': 'Could not find information for this selection.',
+            'error-connect': 'Could not connect to the server.',
+            'distance-from-start': 'Approx. {distance} km from {startLocation}',
+            'coord-warning-text': 'Could not find coordinates for "{startLocation}" to calculate distances. Displaying places without distance info.',
+            'start-location-required': 'Starting location is required to calculate distances.',
+            'title-finder': 'Tourist Place Finder | Incredible India'
+          },
+          hi: {
+             'lang-label': 'भाषा:', 'app-title': 'अतुल्य भारत', 'nav-home': 'होम', 'nav-map': 'नक्शा',
+            'nav-planner': 'AI यात्रा योजनाकार', 'finder-title': 'पर्यटक स्थल खोजक',
+            'finder-subtitle': 'पूरे भारत में अद्भुत स्थलों का अन्वेषण करें। स्पॉट और दूरी खोजने के लिए एक राज्य और जिला चुनें, और अपना प्रारंभिक स्थान दर्ज करें।',
+            'select-state': 'एक राज्य चुनें', 'select-district': 'एक जिला चुनें',
+            'placeholder-start-location': 'आपका प्रारंभिक स्थान (उदा., चेन्नई)',
+            'btn-find-places': 'स्थान खोजें',
+            'results-placeholder': 'पर्यटक स्थल यहां दिखाई देंगे...',
+            'error-select': 'कृपया राज्य और जिला दोनों चुनें।',
+            'error-no-results': 'इस चयन के लिए जानकारी नहीं मिल सकी।',
+            'error-connect': 'सर्वर से कनेक्ट नहीं हो सका।',
+            'distance-from-start': '{startLocation} से लगभग {distance} किमी',
+            'coord-warning-text': '"{startLocation}" के लिए निर्देशांक नहीं मिल सके। दूरियों की गणना किए बिना स्थान प्रदर्शित किए जा रहे हैं।',
+            'start-location-required': 'दूरियों की गणना के लिए प्रारंभिक स्थान आवश्यक है।',
+            'title-finder': 'पर्यटक स्थल खोजक | अतुल्य भारत'
+          },
+          ta: {
+             'lang-label': 'மொழி:', 'app-title': 'நம்பமுடியாத இந்தியா', 'nav-home': 'முகப்பு', 'nav-map': 'வரைபடம்',
+            'nav-planner': 'AI பயணத் திட்டமிடுபவர்', 'finder-title': 'சுற்றுலா இட கண்டுபிடிப்பாளர்',
+            'finder-subtitle': 'இந்தியா முழுவதும் உள்ள அற்புதமான இடங்களைக் கண்டறியுங்கள். இடங்கள் மற்றும் தூரங்களைக் கண்டறிய ஒரு மாநிலம் மற்றும் மாவட்டத்தைத் தேர்ந்தெடுத்து, உங்கள் தொடக்க இருப்பிடத்தை உள்ளிடவும்.',
+            'select-state': 'ஒரு மாநிலத்தைத் தேர்ந்தெடுக்கவும்', 'select-district': 'ஒரு மாவட்டத்தைத் தேர்ந்தெடுக்கவும்',
+            'placeholder-start-location': 'உங்கள் தொடக்க இடம் (எ.கா., சென்னை)',
+            'btn-find-places': 'இடங்களைக் கண்டறியவும்',
+            'results-placeholder': 'சுற்றுலா இடங்கள் இங்கே தோன்றும்...',
+            'error-select': 'தயவுசெய்து ஒரு மாநிலம் மற்றும் மாவட்டத்தைத் தேர்ந்தெடுக்கவும்.',
+            'error-no-results': 'இந்த தேர்வுக்கான தகவலைக் கண்டறிய முடியவில்லை.',
+            'error-connect': 'சேவையகத்துடன் இணைக்க முடியவில்லை.',
+            'distance-from-start': '{startLocation} இலிருந்து தோராயமாக {distance} கிமீ',
+             'coord-warning-text': '"{startLocation}" க்கான ஆயத்தொலைவுகளைக் கண்டறிய முடியவில்லை. தூரங்களைக் கணக்கிடாமல் இடங்கள் காட்டப்படுகின்றன.',
+             'start-location-required': 'தூரங்களைக் கணக்கிட தொடக்க இடம் தேவை.',
+            'title-finder': 'சுற்றுலா இட கண்டுபிடிப்பாளர் | நம்பமுடியாத இந்தியா'
+          },
+           ml: {
+            'lang-label': 'ഭാഷ:', 'app-title': 'അവിശ്വസനീയമായ ഇന്ത്യ', 'nav-home': 'ഹോം', 'nav-map': 'മാപ്പ്',
+            'nav-planner': 'AI ട്രിപ്പ് പ്ലാനർ', 'finder-title': 'ടൂറിസ്റ്റ് പ്ലേസ് ഫൈൻഡർ',
+            'finder-subtitle': 'ഇന്ത്യയിലുടനീളമുള്ള അത്ഭുതകരമായ ലക്ഷ്യസ്ഥാനങ്ങൾ കണ്ടെത്തുക. സ്ഥലങ്ങളും ദൂരങ്ങളും കണ്ടെത്താൻ ഒരു സംസ്ഥാനവും ജില്ലയും തിരഞ്ഞെടുത്ത് നിങ്ങളുടെ ആരംഭ സ്ഥലം നൽകുക.',
+            'select-state': 'ഒരു സംസ്ഥാനം തിരഞ്ഞെടുക്കുക', 'select-district': 'ഒരു ജില്ല തിരഞ്ഞെടുക്കുക',
+            'placeholder-start-location': 'നിങ്ങളുടെ ആരംഭ സ്ഥലം (ഉദാ., ചെന്നൈ)',
+            'btn-find-places': 'സ്ഥലങ്ങൾ കണ്ടെത്തുക',
+            'results-placeholder': 'വിനോദസഞ്ചാര കേന്ദ്രങ്ങൾ ഇവിടെ ദൃശ്യമാകും...',
+            'error-select': 'ദയവായി ഒരു സംസ്ഥാനവും ജില്ലയും തിരഞ്ഞെടുക്കുക.',
+            'error-no-results': 'ഈ തിരഞ്ഞെടുപ്പിനായി വിവരങ്ങൾ കണ്ടെത്താൻ കഴിഞ്ഞില്ല.',
+            'error-connect': 'സെർവറുമായി ബന്ധിപ്പിക്കാൻ കഴിഞ്ഞില്ല.',
+            'distance-from-start': '{startLocation} ൽ നിന്ന് ഏകദേശം {distance} കി.മീ',
+            'coord-warning-text': 'ദൂരം കണക്കാക്കാൻ "{startLocation}" എന്നതിനുള്ള കോർഡിനേറ്റുകൾ കണ്ടെത്താൻ കഴിഞ്ഞില്ല. ദൂര വിവരങ്ങളില്ലാതെ സ്ഥലങ്ങൾ പ്രദർശിപ്പിക്കുന്നു.',
+            'start-location-required': 'ദൂരം കണക്കാക്കാൻ ആരംഭ സ്ഥലം ആവശ്യമാണ്.',
+            'title-finder': 'ടൂറിസ്റ്റ് പ്ലേസ് ഫൈൻഡർ | അവിശ്വസനീയമായ ഇന്ത്യ'
+          },
+          te: {
+            'lang-label': 'భాష:', 'app-title': 'అవిశ్వసనీయమైన భారతదేశం', 'nav-home': 'హోమ్', 'nav-map': 'మ్యాప్',
+            'nav-planner': 'AI ట్రిప్ ప్లానర్', 'finder-title': 'పర్యాటక స్థల ఫైండర్',
+            'finder-subtitle': 'భారతదేశం అంతటా అద్భుతమైన గమ్యస్థానాలను అన్వేషించండి. ప్రదేశాలు మరియు దూరాలను కనుగొనడానికి ఒక రాష్ట్రాన్ని మరియు జిల్లాను ఎంచుకోండి మరియు మీ ప్రారంభ స్థానాన్ని నమోదు చేయండి.',
+            'select-state': 'ఒక రాష్ట్రాన్ని ఎంచుకోండి', 'select-district': 'ఒక జిల్లాను ఎంచుకోండి',
+            'placeholder-start-location': 'మీ ప్రారంభ స్థానం (ఉదా., చెన్నై)',
+            'btn-find-places': 'స్థలాలను కనుగొనండి',
+            'results-placeholder': 'పర్యాటక స్థలాలు ఇక్కడ కనిపిస్తాయి...',
+            'error-select': 'దయచేసి రాష్ట్రం మరియు జిల్లా రెండింటినీ ఎంచుకోండి.',
+            'error-no-results': 'ఈ ఎంపిక కోసం సమాచారం కనుగొనబడలేదు.',
+            'error-connect': 'సర్వర్‌కు కనెక్ట్ కాలేదు.',
+            'distance-from-start': '{startLocation} నుండి సుమారు {distance} కిమీ',
+            'coord-warning-text': 'దూరాలను లెక్కించడానికి "{startLocation}" కోసం కోఆర్డినేట్‌లను కనుగొనలేకపోయాము. దూర సమాచారం లేకుండా స్థలాలను ప్రదర్శిస్తోంది.',
+             'start-location-required': 'దూరాలను లెక్కించడానికి ప్రారంభ స్థానం అవసరం.',
+            'title-finder': 'పర్యాటక స్థల ఫైండర్ | అవిశ్వసనీయమైన భారతదేశం'
+          },
+          kn: {
+            'lang-label': 'ಭಾಷೆ:', 'app-title': 'ಅದ್ಭುತ ಭಾರತ', 'nav-home': 'ಮುಖಪುಟ', 'nav-map': 'ನಕ್ಷೆ',
+            'nav-planner': 'AI ಟ್ರಿಪ್ ಪ್ಲಾನರ್', 'finder-title': 'ಪ್ರವಾಸಿ ಸ್ಥಳ ಶೋಧಕ',
+            'finder-subtitle': 'ಭಾರತದಾದ್ಯಂತ ಅದ್ಭುತ ಸ್ಥಳಗಳನ್ನು ಅನ್ವೇಷಿಸಿ. ಸ್ಥಳಗಳು ಮತ್ತು ದೂರಗಳನ್ನು ಹುಡುಕಲು ರಾಜ್ಯ ಮತ್ತು ಜಿಲ್ಲೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ, ಮತ್ತು ನಿಮ್ಮ ಪ್ರಾರಂಭದ ಸ್ಥಳವನ್ನು ನಮೂದಿಸಿ.',
+            'select-state': 'ರಾಜ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ', 'select-district': 'ಜಿಲ್ಲೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+            'placeholder-start-location': 'ನಿಮ್ಮ ಪ್ರಾರಂಭದ ಸ್ಥಳ (ಉದಾ., ಚೆನ್ನೈ)',
+            'btn-find-places': 'ಸ್ಥಳಗಳನ್ನು ಹುಡುಕಿ',
+            'results-placeholder': 'ಪ್ರವಾಸಿ ತಾಣಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ...',
+            'error-select': 'ದಯವಿಟ್ಟು ರಾಜ್ಯ ಮತ್ತು ಜಿಲ್ಲೆ ಎರಡನ್ನೂ ಆಯ್ಕೆಮಾಡಿ.',
+            'error-no-results': 'ಈ ಆಯ್ಕೆಗಾಗಿ ಮಾಹಿತಿಯನ್ನು ಕಂಡುಹಿಡಿಯಲಾಗಲಿಲ್ಲ.',
+            'error-connect': 'ಸರ್ವರ್‌ಗೆ ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.',
+            'distance-from-start': '{startLocation} ದಿಂದ ಅಂದಾಜು {distance} ಕಿಮೀ',
+             'coord-warning-text': 'ದೂರವನ್ನು ಲೆಕ್ಕಾಚಾರ ಮಾಡಲು "{startLocation}" ಗಾಗಿ ನಿರ್ದೇಶಾಂಕಗಳನ್ನು ಕಂಡುಹಿಡಿಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದೂರ ಮಾಹಿತಿಯಿಲ್ಲದೆ ಸ್ಥಳಗಳನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗುತ್ತಿದೆ.',
+             'start-location-required': 'ದೂರವನ್ನು ಲೆಕ್ಕಾಚಾರ ಮಾಡಲು ಪ್ರಾರಂಭದ ಸ್ಥಳ ಅಗತ್ಯವಿದೆ.',
+            'title-finder': 'ಪ್ರವಾಸಿ ಸ್ಥಳ ಶೋಧಕ | ಅದ್ಭುತ ಭಾರತ'
+          },
+          bn: {
+            'lang-label': 'ভাষা:', 'app-title': 'অবিশ্বাস্য ভারত', 'nav-home': 'হোম', 'nav-map': 'মানচিত্র',
+            'nav-planner': 'AI ট্রিপ প্ল্যানার', 'finder-title': 'পর্যটন স্থান ফাইন্ডার',
+            'finder-subtitle': 'ভারত জুড়ে আশ্চর্যজনক গন্তব্যগুলি অন্বেষণ করুন। স্থান ও দূরত্ব খুঁজে পেতে একটি রাজ্য এবং জেলা নির্বাচন করুন, এবং আপনার শুরুর অবস্থান লিখুন।',
+            'select-state': 'একটি রাজ্য নির্বাচন করুন', 'select-district': 'একটি জেলা নির্বাচন করুন',
+            'placeholder-start-location': 'আপনার শুরুর অবস্থান (যেমন, চেন্নাই)',
+            'btn-find-places': 'স্থান খুঁজুন',
+            'results-placeholder': 'পর্যটন স্পটগুলি এখানে প্রদর্শিত হবে...',
+            'error-select': 'অনুগ্রহ করে রাজ্য এবং জেলা উভয়ই নির্বাচন করুন।',
+            'error-no-results': 'এই নির্বাচনের জন্য তথ্য খুঁজে পাওয়া যায়নি।',
+            'error-connect': 'সার্ভারের সাথে সংযোগ স্থাপন করা যায়নি।',
+            'distance-from-start': '{startLocation} থেকে আনুমানিক {distance} কিমি',
+             'coord-warning-text': 'দূরত্ব গণনা করার জন্য "{startLocation}" এর স্থানাঙ্ক খুঁজে পাওয়া যায়নি। দূরত্বের তথ্য ছাড়াই স্থানগুলি প্রদর্শন করা হচ্ছে।',
+             'start-location-required': 'দূরত্ব গণনা করার জন্য শুরুর অবস্থান প্রয়োজন।',
+            'title-finder': 'পর্যটন স্থান ফাইন্ডার | অবিশ্বাস্য ভারত'
+          },
+          mr: {
+            'lang-label': 'भाषा:', 'app-title': 'अतुल्य भारत', 'nav-home': 'होम', 'nav-map': 'नकाशा',
+            'nav-planner': 'AI ट्रिप प्लॅनर', 'finder-title': 'पर्यटन स्थळ शोधक',
+            'finder-subtitle': 'संपूर्ण भारतातील आश्चर्यकारक ठिकाणे एक्सप्लोर करा. स्थळे व अंतर शोधण्यासाठी राज्य आणि जिल्हा निवडा, आणि तुमचे प्रारंभ स्थान प्रविष्ट करा.',
+            'select-state': 'राज्य निवडा', 'select-district': 'जिल्हा निवडा',
+            'placeholder-start-location': 'तुमचे प्रारंभ स्थान (उदा., चेन्नई)',
+            'btn-find-places': 'ठिकाणे शोधा',
+            'results-placeholder': 'पर्यटन स्थळे येथे दिसतील...',
+            'error-select': 'कृपया राज्य आणि जिल्हा दोन्ही निवडा.',
+            'error-no-results': 'या निवडीसाठी माहिती मिळू शकली नाही.',
+            'error-connect': 'सर्व्हरशी कनेक्ट होऊ शकले नाही.',
+            'distance-from-start': '{startLocation} पासून अंदाजे {distance} किमी',
+            'coord-warning-text': 'अंतर मोजण्यासाठी "{startLocation}" साठी COORDINATES सापडले नाहीत. अंतराच्या माहितीशिवाय ठिकाणे दर्शवित आहे.',
+            'start-location-required': 'अंतर मोजण्यासाठी प्रारंभ स्थान आवश्यक आहे.',
+            'title-finder': 'पर्यटन स्थळ शोधक | अतुल्य भारत'
+          }
+        };
+
+        const languageSelect = document.getElementById('language-select');
+        const stateSelect = document.getElementById('state');
+        const districtSelect = document.getElementById('district');
+        const resultsContent = document.getElementById('results-content');
+        const startLocationInput = document.getElementById('startLocation');
+        const coordWarningDiv = document.getElementById('coord-warning');
+
+        const updateContent = (lang) => {
+             const currentTranslations = translations[lang];
+            if (!currentTranslations) return;
+
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (currentTranslations[key]) element.textContent = currentTranslations[key];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (currentTranslations[key]) element.placeholder = currentTranslations[key];
+            });
+
+            if (stateSelect && stateSelect.options[0]?.disabled) {
+                 stateSelect.options[0].text = currentTranslations['select-state'];
+            }
+             if (districtSelect && districtSelect.options[0]?.disabled) {
+                 districtSelect.options[0].text = currentTranslations['select-district'];
+            }
+
+            document.title = currentTranslations['title-finder'];
+        };
+
+        languageSelect.addEventListener('change', (e) => {
+            const selectedLang = e.target.value;
+            updateContent(selectedLang);
+            populateDistricts();
+
+             const startLat = parseFloat(resultsContent.dataset.startLat || 'NaN');
+             const startLon = parseFloat(resultsContent.dataset.startLon || 'NaN');
+             const startLocName = resultsContent.dataset.startLocName || '';
+
+             if (!isNaN(startLat) && !isNaN(startLon) && startLocName) {
+                 addDistancesToCards(startLat, startLon, startLocName, selectedLang);
+                 // Update warning text language if visible
+                 if (coordWarningDiv.style.display === 'block') {
+                    const warnText = (translations[selectedLang] || translations.en)['coord-warning-text']
+                                     .replace('{startLocation}', startLocName);
+                     coordWarningDiv.textContent = warnText;
+                 }
+             }
+        });
+
+        function populateStates() {
+              const sortedStates = Object.keys(stateDistrictData).sort();
+             sortedStates.forEach(state => {
+                 const option = document.createElement('option');
+                 option.value = state;
+                 option.textContent = state;
+                 stateSelect.appendChild(option);
+             });
+        }
+
+        function populateDistricts() {
+             const selectedState = stateSelect.value;
+            const districts = stateDistrictData[selectedState] || [];
+            const selectedLang = languageSelect.value;
+            const currentTranslations = translations[selectedLang] || translations.en;
+            const currentDistrictValue = districtSelect.value;
+
+            districtSelect.innerHTML = `<option value="" disabled selected>${currentTranslations['select-district']}</option>`;
+
+            if (districts.length > 0) {
+                districts.sort().forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    if (district === currentDistrictValue) { option.selected = true; }
+                    districtSelect.appendChild(option);
+                });
+                districtSelect.disabled = false;
+            } else {
+                districtSelect.disabled = true;
+            }
+        }
+
+         function calculateDistance(lat1, lon1, lat2, lon2) {
+              const R = 6371; // km
+             const dLat = (lat2 - lat1) * Math.PI / 180;
+             const dLon = (lon2 - lon1) * Math.PI / 180;
+             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                       Math.sin(dLon / 2) * Math.sin(dLon / 2);
+             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+             return R * c;
+         }
+
+         function addDistancesToCards(startLat, startLon, startLocationName, currentLang) {
+             const currentTranslations = translations[currentLang] || translations.en;
+
+             resultsContent.querySelectorAll('.place-card').forEach(card => {
+                 const existingDistance = card.querySelector('.distance-info');
+                 if (existingDistance) existingDistance.remove();
+
+                 const lat = card.dataset.lat;
+                 const lon = card.dataset.lon;
+
+                 if (lat && lon) {
+                     const distance = calculateDistance(startLat, startLon, parseFloat(lat), parseFloat(lon));
+                     let distanceText = currentTranslations['distance-from-start'] || translations['en']['distance-from-start'];
+                     distanceText = distanceText.replace('{distance}', Math.round(distance));
+                     distanceText = distanceText.replace('{startLocation}', startLocationName);
+
+                     const distanceDiv = document.createElement('div');
+                     distanceDiv.className = 'distance-info';
+                     distanceDiv.textContent = distanceText;
+                     card.appendChild(distanceDiv);
+                 }
+             });
+         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+             populateStates();
+             updateContent('en');
+
+            const menuIcon = document.getElementById('menuIcon');
+            const navMenu = document.getElementById('navMenu');
+            menuIcon.addEventListener('click', () => {
+                menuIcon.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+
+             stateSelect.addEventListener('change', populateDistricts);
+
+            const placeForm = document.getElementById('placeForm');
+            const resultsDiv = document.getElementById('place-results');
+            const placeholderText = document.getElementById('placeholder-text');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const backendUrl = 'http://localhost:5000';
+
+            placeForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const state = stateSelect.value;
+                const district = districtSelect.value;
+                // const location = REMOVED
+                const startLocation = startLocationInput.value;
+                const selectedLang = languageSelect.value;
+                const currentTranslations = translations[selectedLang] || translations.en;
+
+                // --- Reset UI elements ---
+                resultsContent.innerHTML = '';
+                placeholderText.style.display = 'none';
+                loadingSpinner.style.display = 'block';
+                coordWarningDiv.style.display = 'none';
+                coordWarningDiv.textContent = '';
+                 resultsContent.removeAttribute('data-start-lat');
+                 resultsContent.removeAttribute('data-start-lon');
+                 resultsContent.removeAttribute('data-start-loc-name');
+                // --- End Reset ---
+
+                if (!state || !district) {
+                    loadingSpinner.style.display = 'none';
+                    placeholderText.style.color = 'red';
+                    placeholderText.textContent = currentTranslations['error-select'];
+                    placeholderText.style.display = 'block';
+                    return;
+                }
+                 if (!startLocation) {
+                      loadingSpinner.style.display = 'none';
+                      placeholderText.style.color = 'red';
+                      placeholderText.textContent = currentTranslations['start-location-required'];
+                      placeholderText.style.display = 'block';
+                      return;
+                 }
+
+
+                try {
+                    const response = await fetch(`${backendUrl}/api/find-places`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        // REMOVED location from body
+                        body: JSON.stringify({ state, district, startLocation, language: selectedLang })
+                    });
+
+                    const data = await response.json();
+                    loadingSpinner.style.display = 'none';
+
+                    if (response.ok && data.placesHtml) {
+                        resultsContent.innerHTML = data.placesHtml;
+
+                        if (data.startLat != null && data.startLon != null) {
+                             resultsContent.dataset.startLat = data.startLat;
+                             resultsContent.dataset.startLon = data.startLon;
+                             resultsContent.dataset.startLocName = startLocation;
+                             addDistancesToCards(data.startLat, data.startLon, startLocation, selectedLang);
+                             coordWarningDiv.style.display = 'none';
+                        } else {
+                             console.warn("Backend did not return start location coordinates. Skipping distance calculation.");
+                             const warnText = currentTranslations['coord-warning-text'].replace('{startLocation}', startLocation);
+                             coordWarningDiv.textContent = warnText;
+                             coordWarningDiv.style.display = 'block';
+                        }
+
+                    } else {
+                        placeholderText.style.color = 'red';
+                        placeholderText.textContent = data.message || currentTranslations['error-no-results'];
+                        placeholderText.style.display = 'block';
+                    }
+
+                } catch (error) {
+                    console.error('Failed to fetch places:', error);
+                    loadingSpinner.style.display = 'none';
+                    placeholderText.style.color = 'red';
+                    placeholderText.textContent = currentTranslations['error-connect'];
+                    placeholderText.style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI-Powered Map | Incredible India</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #ff6700;
+            --secondary-color: #046A38;
+            --text-color: #333;
+            --white-color: #ffffff;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background-color: var(--white-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            flex-shrink: 0;
+            z-index: 1001;
+            position: relative;
+        }
+        .navbar .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+        .navbar .logo img { width: 40px; }
+        .navbar .logo h1 { font-size: 1.5rem; color: var(--primary-color); }
+        .navbar nav { display: flex; align-items: center; gap: 1rem; }
+        .navbar nav a { text-decoration: none; font-weight: 600; color: var(--text-color); }
+
+        /* --- Language Selector CSS --- */
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 1rem; /* Added margin */
+        }
+        #language-select {
+            padding: 0.3rem 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            font-size: 0.8rem;
+        }
+
+        /* Hamburger menu */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 25px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .menu-toggle span {
+            display: block;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 2px;
+             transition: all 0.3s ease-in-out; /* Added transition for animation */
+        }
+        /* Active state for hamburger */
+         .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+         .menu-toggle.active span:nth-child(2) { opacity: 0; }
+         .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+
+        .main-content { display: flex; flex-grow: 1; position: relative; }
+        #map { height: 100%; width: 100%; z-index: 1; }
+
+        .search-container { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 500px; max-width: 90%; }
+        #search-input { width: 100%; padding: 12px 20px; font-size: 1rem; border: none; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); padding-right: 45px; }
+        #search-spinner { position: absolute; right: 15px; top: 13px; width: 20px; height: 20px; border: 3px solid #ccc; border-top: 3px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        #details-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 500px;
+            max-width: 90%;
+            height: 100%;
+            background-color: var(--white-color);
+            z-index: 1000;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.15);
+            transform: translateX(100%);
+            transition: transform 0.4s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+        #details-panel.visible { transform: translateX(0); }
+        #details-panel .panel-content { padding: 1.5rem; overflow-y: auto; flex-grow: 1; }
+        #details-panel h2 { font-size: 1.8rem; color: var(--primary-color); margin-bottom: 1rem; }
+        #panel-description { font-size: 0.95rem; color: #555; text-align: justify; line-height: 1.7; min-height: 100px; white-space: pre-wrap; }
+
+        .blinking-cursor { font-weight: bold; animation: blink 1s step-end infinite; }
+        @keyframes blink { from, to { color: transparent; } 50% { color: var(--primary-color); } }
+
+        .ai-buttons { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .ai-btn { flex: 1; padding: 8px; border: 1px solid var(--primary-color); border-radius: 50px; background: transparent; color: var(--primary-color); font-weight: 600; cursor: pointer; transition: background-color 0.2s, color 0.2s;}
+        .ai-btn:hover { background-color: var(--primary-color); color: var(--white-color); }
+
+        .info-section { margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1.5rem; }
+        .weather-info { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        /* Icon styles removed */
+        .weather-temp { font-size: 2rem; font-weight: 600; }
+        .weather-desc { color: #777; }
+        .climate-tips-list { list-style: none; padding-left: 0; margin-top: 1rem; }
+        .climate-tips-list li { padding-left: 1.5rem; position: relative; margin-bottom: 0.5rem; color: #555; }
+        .climate-tips-list li::before { content: '✓'; color: var(--secondary-color); position: absolute; left: 0; font-weight: bold; }
+
+        #close-btn { position: absolute; top: 10px; right: 15px; font-size: 2rem; cursor: pointer; color: #aaa; }
+
+        /* 📱 Responsive Mobile */
+        @media (max-width: 768px) {
+            .navbar nav {
+                position: absolute;
+                top: 70px; /* Adjusted */
+                right: 5%; /* Align to the right edge */
+                background: var(--white-color);
+                flex-direction: column;
+                align-items: flex-start;
+                width: auto; /* Adjust width as needed */
+                min-width: 180px; /* Ensure enough width */
+                padding: 1rem;
+                display: none;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                z-index: 1000;
+            }
+            .navbar nav.show { display: flex; }
+            /* Make selector and links full width in mobile nav */
+            .navbar nav a, .navbar nav .language-selector {
+                margin: 0.5rem 0;
+                font-size: 0.9rem;
+                width: 100%;
+            }
+            .navbar nav .language-selector {
+                gap: 0.5rem;
+                justify-content: space-between;
+            }
+            .navbar nav #language-select {
+                font-size: 0.9rem;
+                flex-grow: 1; /* Make select fill remaining space */
+            }
+
+            .menu-toggle { display: flex; }
+
+            #details-panel { width: 100%; max-width: 100%; }
+            .search-container { top: 10px; width: 90%; }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="index.html" class="logo">
+            <img src="https://img.icons8.com/color/48/lotus.png" alt="Tourism Logo" />
+            <h1 data-i18n="app-title">Incredible India</h1>
+        </a>
+        <div class="menu-toggle" id="menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <nav id="nav-links">
+            <div class="language-selector">
+                <label for="language-select" data-i18n="lang-label">Language:</label>
+                <select id="language-select">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                    <option value="ml">മലയാളം (Malayalam)</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                    <option value="bn">বাংলা (Bengali)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                </select>
+            </div>
+            <a href="index.html" data-i18n="nav-home">Home</a>
+            <a href="festivals.html" data-i18n="nav-festivals">Tourist Place Finder</a>
+            <a href="plan.html" data-i18n="nav-planner">AI Trip Planner</a>
+         </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search for any location in India..." data-i18n-placeholder="search-placeholder">
+            <div id="search-spinner"></div>
+        </div>
+        <div id="map"></div>
+
+        <aside id="details-panel">
+            <span id="close-btn">&times;</span>
+            <div class="panel-content">
+                <h2 id="panel-title">Location Title</h2>
+                <div id="panel-description"></div>
+                <div class="ai-buttons">
+                    <button class="ai-btn" data-question="Tell me a fun fact" data-i18n="btn-fun-fact">Fun Fact</button>
+                    <button class="ai-btn" data-question="Describe the architecture" data-i18n="btn-architecture">Architecture</button>
+                    <button class="ai-btn" data-question="Why is it famous?" data-i18n="btn-why-famous">Why Famous?</button>
+                </div>
+                <div class="info-section">
+                    <h3 data-i18n="weather-title">Current Weather</h3>
+                    <div class="weather-info">
+                         <div>
+                            <span id="weather-temp" class="weather-temp">--°C</span>
+                            <div id="weather-desc" class="weather-desc" data-i18n="weather-loading">Loading...</div>
+                        </div>
+                    </div>
+                    <ul class="climate-tips-list" id="climate-tips-list"></ul>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const backendUrl = 'http://localhost:5000'; // Make sure this matches your backend
+
+            // --- TRANSLATION SCRIPT ---
+            const translations = {
+              en: {
+                'lang-label': 'Language:',
+                'app-title': 'Incredible India',
+                'nav-home': 'Home',
+                'nav-planner': 'AI Trip Planner',
+                'nav-festivals': 'Tourist Place Finder', // Updated Text
+                'search-placeholder': 'Search for any location in India...',
+                'btn-fun-fact': 'Fun Fact',
+                'btn-architecture': 'Architecture',
+                'btn-why-famous': 'Why Famous?',
+                'weather-title': 'Current Weather',
+                'weather-loading': 'Loading...',
+                'weather-error': 'Could not load.',
+                'ai-thinking': 'Thinking...',
+                'ai-history-generating': 'Generating history...',
+                'ai-error': 'Could not get an answer.',
+                'title-map': 'AI-Powered Map | Incredible India'
+              },
+              hi: {
+                'lang-label': 'भाषा:',
+                'app-title': 'अतुल्य भारत',
+                'nav-home': 'होम',
+                'nav-planner': 'AI यात्रा योजनाकार',
+                'nav-festivals': 'पर्यटक स्थल खोजक',
+                'search-placeholder': 'भारत में किसी भी स्थान को खोजें...',
+                'btn-fun-fact': 'रोचक तथ्य',
+                'btn-architecture': 'वास्तुकला',
+                'btn-why-famous': 'क्यों प्रसिद्ध है?',
+                'weather-title': 'वर्तमान मौसम',
+                'weather-loading': 'लोड हो रहा है...',
+                'weather-error': 'लोड नहीं हो सका।',
+                'ai-thinking': 'सोच रहा हूँ...',
+                'ai-history-generating': 'इतिहास बना रहा हूँ...',
+                'ai-error': 'उत्तर नहीं मिल सका।',
+                'title-map': 'AI-संचालित नक्शा | अतुल्य भारत'
+              },
+              ta: {
+                'lang-label': 'மொழி:',
+                'app-title': 'நம்பமுடியாத இந்தியா',
+                'nav-home': 'முகப்பு',
+                'nav-planner': 'AI பயணத் திட்டமிடுபவர்',
+                'nav-festivals': 'சுற்றுலா இட கண்டுபிடிப்பாளர்',
+                'search-placeholder': 'இந்தியாவில் எந்த இடத்தையும் தேடவும்...',
+                'btn-fun-fact': 'சுவாரஸ்யமான உண்மை',
+                'btn-architecture': 'கட்டிடக்கலை',
+                'btn-why-famous': 'ஏன் பிரபலமானது?',
+                'weather-title': 'தற்போதைய வானிலை',
+                'weather-loading': 'ஏற்றுகிறது...',
+                'weather-error': 'ஏற்ற முடியவில்லை.',
+                'ai-thinking': 'சிந்திக்கிறேன்...',
+                'ai-history-generating': 'வரலாற்றை உருவாக்குகிறேன்...',
+                'ai-error': 'பதில் பெற முடியவில்லை.',
+                'title-map': 'AI-இயங்கும் வரைபடம் | நம்பமுடியாத இந்தியா'
+              },
+              ml: {
+                'lang-label': 'ഭാഷ:',
+                'app-title': 'അവിശ്വസനീയമായ ഇന്ത്യ',
+                'nav-home': 'ഹോം',
+                'nav-planner': 'AI ട്രിപ്പ് പ്ലാനർ',
+                'nav-festivals': 'ടൂറിസ്റ്റ് പ്ലേസ് ഫൈൻഡർ',
+                'search-placeholder': 'ഇന്ത്യയിൽ എവിടെയും തിരയുക...',
+                'btn-fun-fact': 'രസകരമായ വസ്തുത',
+                'btn-architecture': 'വാസ്തുവിദ്യ',
+                'btn-why-famous': 'എന്തുകൊണ്ട് പ്രശസ്തം?',
+                'weather-title': 'നിലവിലെ കാലാവസ്ഥ',
+                'weather-loading': 'ലോഡ് ചെയ്യുന്നു...',
+                'weather-error': 'ലോഡ് ചെയ്യാൻ കഴിഞ്ഞില്ല.',
+                'ai-thinking': 'ചിന്തിക്കുന്നു...',
+                'ai-history-generating': 'ചരിത്രം സൃഷ്ടിക്കുന്നു...',
+                'ai-error': 'ഉത്തരം ലഭിച്ചില്ല.',
+                'title-map': 'AI-പവർഡ് മാപ്പ് | അവിശ്വസനീയമായ ഇന്ത്യ'
+              },
+              te: {
+                'lang-label': 'భాష:',
+                'app-title': 'అవిశ్వసనీయమైన భారతదేశం',
+                'nav-home': 'హోమ్',
+                'nav-planner': 'AI ట్రిప్ ప్లానర్',
+                'nav-festivals': 'పర్యాటక స్థల ఫైండర్',
+                'search-placeholder': 'భారతదేశంలో ఏదైనా ప్రదేశం కోసం శోధించండి...',
+                'btn-fun-fact': 'సరదా వాస్తవం',
+                'btn-architecture': 'ఆర్కిటెక్చర్',
+                'btn-why-famous': 'ఎందుకు ప్రసిద్ధి?',
+                'weather-title': 'ప్రస్తుత వాతావరణం',
+                'weather-loading': 'లోడ్ అవుతోంది...',
+                'weather-error': 'లోడ్ చేయడం సాధ్యం కాలేదు.',
+                'ai-thinking': 'ఆలోచిస్తున్నాను...',
+                'ai-history-generating': 'చరిత్రను సృష్టిస్తోంది...',
+                'ai-error': 'సమాధానం పొందలేకపోయాను.',
+                'title-map': 'AI-ఆధారిత మ్యాప్ | అవిశ్వసనీయమైన భారతదేశం'
+              },
+              kn: {
+                'lang-label': 'ಭಾಷೆ:',
+                'app-title': 'ಅದ್ಭುತ ಭಾರತ',
+                'nav-home': 'ಮುಖಪುಟ',
+                'nav-planner': 'AI ಟ್ರಿಪ್ ಪ್ಲಾನರ್',
+                'nav-festivals': 'ಪ್ರವಾಸಿ ಸ್ಥಳ ಶೋಧಕ',
+                'search-placeholder': 'ಭಾರತದಲ್ಲಿ ಯಾವುದೇ ಸ್ಥಳಕ್ಕಾಗಿ ಹುಡುಕಿ...',
+                'btn-fun-fact': 'ಮೋಜಿನ ಸಂಗತಿ',
+                'btn-architecture': 'ವಾಸ್ತುಶಿಲ್ಪ',
+                'btn-why-famous': 'ಏಕೆ ಪ್ರಸಿದ್ಧ?',
+                'weather-title': 'ಪ್ರಸ್ತುತ ಹವಾಮಾನ',
+                'weather-loading': 'ಲೋಡ್ ಆಗುತ್ತಿದೆ...',
+                'weather-error': 'ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.',
+                'ai-thinking': 'ಯೋಚಿಸುತ್ತಿದೆ...',
+                'ai-history-generating': 'ಇತಿಹಾಸವನ್ನು ರಚಿಸಲಾಗುತ್ತಿದೆ...',
+                'ai-error': 'ಉತ್ತರವನ್ನು ಪಡೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.',
+                'title-map': 'AI-ಚಾಲಿತ ನಕ್ಷೆ | ಅದ್ಭುತ ಭಾರತ'
+              },
+              bn: {
+                'lang-label': 'ভাষা:',
+                'app-title': 'অবিশ্বাস্য ভারত',
+                'nav-home': 'হোম',
+                'nav-planner': 'AI ট্রিপ প্ল্যানার',
+                'nav-festivals': 'পর্যটন স্থান ফাইন্ডার',
+                'search-placeholder': 'ভারতের যেকোনো স্থানের জন্য অনুসন্ধান করুন...',
+                'btn-fun-fact': 'মজার তথ্য',
+                'btn-architecture': 'স্থাপত্য',
+                'btn-why-famous': 'কেন বিখ্যাত?',
+                'weather-title': 'বর্তমান আবহাওয়া',
+                'weather-loading': 'লোড হচ্ছে...',
+                'weather-error': 'লোড করা যায়নি।',
+                'ai-thinking': 'ভাবছি...',
+                'ai-history-generating': 'ইতিহাস তৈরি করছি...',
+                'ai-error': 'উত্তর পাওয়া যায়নি।',
+                'title-map': 'AI-চালিত মানচিত্র | অবিশ্বাস্য ভারত'
+              },
+              mr: {
+                'lang-label': 'भाषा:',
+                'app-title': 'अतुल्य भारत',
+                'nav-home': 'होम',
+                'nav-planner': 'AI ट्रिप प्लॅनर',
+                'nav-festivals': 'पर्यटन स्थळ शोधक',
+                'search-placeholder': 'भारतातील कोणत्याही स्थानासाठी शोधा...',
+                'btn-fun-fact': 'मजेदार तथ्य',
+                'btn-architecture': 'वाസ്തുशास्त्र',
+                'btn-why-famous': 'का प्रसिद्ध?',
+                'weather-title': 'सध्याचे हवामान',
+                'weather-loading': 'लोड करत आहे...',
+                'weather-error': 'लोड करू शकलो नाही.',
+                'ai-thinking': 'विचार करत आहे...',
+                'ai-history-generating': 'इतिहास तयार करत आहे...',
+                'ai-error': 'उत्तर मिळू शकले नाही.',
+                'title-map': 'AI-शक्तीचा नकाशा | अतुल्य भारत'
+              }
+            };
+
+            const languageSelect = document.getElementById('language-select');
+
+            const updateContent = (lang) => {
+                const currentTranslations = translations[lang];
+                if (!currentTranslations) return; // Exit if language not found
+
+                document.querySelectorAll('[data-i18n]').forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    if (currentTranslations[key]) {
+                        element.textContent = currentTranslations[key];
+                    }
+                });
+
+                document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                    const key = element.getAttribute('data-i18n-placeholder');
+                    if (currentTranslations[key]) {
+                        element.placeholder = currentTranslations[key];
+                    }
+                });
+
+                document.title = currentTranslations['title-map'];
+            };
+
+            languageSelect.addEventListener('change', (e) => {
+                updateContent(e.target.value);
+                // If details panel is open, re-fetch data in the new language
+                if (detailsPanel.classList.contains('visible')) {
+                    const locationName = document.getElementById('panel-title').textContent;
+                    if(locationName && locationName !== 'Location Title') { // Check if a location is loaded
+                        generateHistory(locationName); // Re-fetch history
+                        getWeather(locationName); // Re-fetch weather
+                    }
+                }
+            });
+
+            updateContent('en'); // Set initial language
+            // --- END TRANSLATION SCRIPT ---
+
+
+            const map = L.map("map", { zoomControl: false }).setView([22.5937, 78.9629], 5);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            const menuToggle = document.getElementById('menu-toggle');
+            const navLinks = document.getElementById('nav-links');
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('show');
+                menuToggle.classList.toggle('active'); // Toggle active class for animation
+            });
+
+            let temporaryMarker = null;
+            const detailsPanel = document.getElementById('details-panel');
+            const descriptionEl = document.getElementById('panel-description');
+            let typeInterval;
+
+            function typewriterEffect(element, text, speed = 20) {
+                clearInterval(typeInterval);
+                if (typeof text !== 'string') {
+                    console.error("Invalid text passed to typewriterEffect:", text);
+                    element.textContent = (translations[languageSelect.value] || translations.en)['ai-error'];
+                    return;
+                }
+                let cleanedText = text.replace(/\*\*/g, '');
+                element.innerHTML = '';
+                let i = 0;
+                const cursor = document.createElement('span');
+                cursor.className = 'blinking-cursor';
+                cursor.textContent = '_';
+                element.appendChild(cursor);
+
+                typeInterval = setInterval(() => {
+                    if (i < cleanedText.length) {
+                        element.insertBefore(document.createTextNode(cleanedText.charAt(i)), cursor);
+                        i++;
+                    } else {
+                        cursor.remove();
+                        clearInterval(typeInterval);
+                    }
+                }, speed);
+            }
+
+
+            const getWeather = async (locationName) => {
+                const selectedLang = languageSelect.value;
+                const currentTranslations = translations[selectedLang] || translations.en;
+
+                const weatherDescEl = document.getElementById('weather-desc');
+                const climateTipsList = document.getElementById('climate-tips-list');
+                const weatherTempEl = document.getElementById('weather-temp');
+
+                weatherDescEl.textContent = currentTranslations['weather-loading'];
+                weatherTempEl.textContent = '--°C';
+                climateTipsList.innerHTML = '';
+
+                try {
+                    const response = await fetch(`${backendUrl}/api/map/weather`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ locationName, language: selectedLang })
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data) { // Check if data is received
+                        weatherTempEl.textContent = `${Math.round(data.temp)}°C`;
+                        weatherDescEl.textContent = data.description;
+
+                        if (data.tips && Array.isArray(data.tips)) {
+                            if (data.tips.length > 0) {
+                                data.tips.forEach(tip => {
+                                    const li = document.createElement('li');
+                                    li.textContent = tip;
+                                    climateTipsList.appendChild(li);
+                                });
+                            } else {
+                                // Handle case where tips array is empty
+                                climateTipsList.innerHTML = `<li>No specific tips available.</li>`; // Needs translation
+                            }
+                        } else {
+                             // Handle case where tips array is missing
+                            console.warn("Weather tips missing from API response:", data);
+                            climateTipsList.innerHTML = `<li>${currentTranslations['ai-error'] || 'Tips unavailable.'}</li>`;
+                        }
+                    } else {
+                         weatherDescEl.textContent = currentTranslations['weather-error'];
+                         console.error("Weather API Error Response:", data);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch weather:", error);
+                    weatherDescEl.textContent = currentTranslations['weather-error'];
+                }
+            };
+
+            const showDetails = (location) => {
+                if (!location || !location.name) {
+                    console.error("Invalid location data passed to showDetails");
+                    return;
+                }
+                document.getElementById('panel-title').textContent = location.name;
+                generateHistory(location.name);
+                getWeather(location.name);
+                detailsPanel.classList.add('visible');
+            };
+            document.getElementById('close-btn').addEventListener('click', () => detailsPanel.classList.remove('visible'));
+
+            const queryAI = async (locationName, question) => {
+                const selectedLang = languageSelect.value;
+                const currentTranslations = translations[selectedLang] || translations.en;
+
+                descriptionEl.innerHTML = currentTranslations['ai-thinking'] + '<span class="blinking-cursor">_</span>';
+                try {
+                    const response = await fetch(`${backendUrl}/api/map/query`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ locationName, question, language: selectedLang })
+                    });
+                     if (!response.ok) {
+                         const errorData = await response.json().catch(() => ({ message: `API responded with status ${response.status}` }));
+                         throw new Error(errorData.message || `API responded with status ${response.status}`);
+                     }
+                    const data = await response.json();
+                     if (!data || typeof data.answer !== 'string') { // Check type of answer
+                         throw new Error("Invalid or missing 'answer' in AI response");
+                     }
+                    typewriterEffect(descriptionEl, data.answer);
+                } catch (error) {
+                     console.error("Error during AI query:", error);
+                    descriptionEl.textContent = currentTranslations['ai-error'];
+                }
+            };
+
+            const generateHistory = async (locationName) => {
+                const selectedLang = languageSelect.value;
+                const currentTranslations = translations[selectedLang] || translations.en;
+
+                descriptionEl.innerHTML = currentTranslations['ai-history-generating'] + '<span class="blinking-cursor">_</span>';
+                try {
+                     const response = await fetch(`${backendUrl}/api/map/history`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ locationName, language: selectedLang })
+                    });
+                     if (!response.ok) {
+                          const errorData = await response.json().catch(() => ({ message: `API responded with status ${response.status}` }));
+                         throw new Error(errorData.message || `API responded with status ${response.status}`);
+                     }
+                    const data = await response.json();
+                     if (!data || typeof data.history !== 'string') { // Check type of history
+                          throw new Error("Invalid or missing 'history' in AI response");
+                     }
+                    typewriterEffect(descriptionEl, data.history);
+                } catch (error) {
+                     console.error("Error during history generation:", error);
+                    descriptionEl.textContent = currentTranslations['ai-error'];
+                }
+            };
+
+            document.querySelector('.ai-buttons').addEventListener('click', (e) => {
+                if(e.target.classList.contains('ai-btn')) {
+                    const locationName = document.getElementById('panel-title').textContent;
+                    if (locationName && locationName !== 'Location Title') { // Check default title
+                         const question = e.target.dataset.question;
+                         queryAI(locationName, question);
+                    } else {
+                         console.warn("No location selected in the panel to query about.");
+                    }
+                }
+            });
+
+            const searchInput = document.getElementById('search-input');
+            const searchSpinner = document.getElementById('search-spinner');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(async () => {
+                    const query = searchInput.value;
+                    if (query.length < 3) return;
+
+                    searchSpinner.style.display = 'block';
+                    try {
+                        const response = await fetch(`${backendUrl}/api/map/search`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ query })
+                        });
+                        if (!response.ok) {
+                            throw new Error(`Search API failed with status ${response.status}`);
+                        }
+                        const matchedLocations = await response.json();
+
+                        if (matchedLocations && matchedLocations.length > 0) {
+                            const loc = matchedLocations[0];
+                            if (typeof loc.lat === 'number' && typeof loc.lon === 'number' && loc.name) { // Also check name
+                                if (temporaryMarker) {
+                                    map.removeLayer(temporaryMarker);
+                                }
+                                temporaryMarker = L.marker([loc.lat, loc.lon]).addTo(map);
+                                showDetails(loc); // Opens panel and fetches AI data
+                                map.flyTo([loc.lat, loc.lon], 13, { animate: true, duration: 1.5 });
+                             } else {
+                                 console.warn("Search result missing valid coordinates or name:", loc);
+                             }
+                        } else {
+                             console.log("No locations found for query:", query);
+                             // Optionally provide user feedback (e.g., clear panel, show message)
+                             detailsPanel.classList.remove('visible'); // Close panel if nothing found
+                             if (temporaryMarker) map.removeLayer(temporaryMarker); // Remove old marker
+                        }
+                    } catch (error) {
+                        console.error("Search failed:", error);
+                         // Optionally provide user feedback about the error
+                         alert("Search failed. Please try again later."); // Simple alert
+                    } finally {
+                        searchSpinner.style.display = 'none';
+                    }
+                }, 1000); // 1-second debounce
+            });
+        });
+    </script>
+</body>
+</html>

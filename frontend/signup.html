@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up | Incredible India</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #ff6700;
+      --text-color: #333;
+      --white-color: #ffffff;
+      --shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+      --border-radius: 12px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+       background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://i.imgur.com/Bq5D5t8.jpeg') no-repeat center center;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .auth-container {
+      background: var(--white-color);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 600px;
+      position: relative; /* <-- Added for selector positioning */
+    }
+    
+    /* --- Language Selector CSS --- */
+    .language-selector {
+        position: absolute;
+        top: 20px; /* Desktop spacing */
+        right: 25px; /* Desktop spacing */
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    #language-select {
+        padding: 0.3rem 0.5rem;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-family: inherit;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      margin-top: 25px; /* Added margin to avoid overlap with selector */
+    }
+    .logo h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-color);
+      margin: 0;
+    }
+    .auth-container h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary-color);
+      text-align: center;
+    }
+    .auth-container p {
+      margin-top: 1.2rem;
+      color: black;
+      text-align: center;
+      grid-column: 1 / -1;
+    }
+    .auth-container a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    #signupForm {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+    .input-group {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .input-group label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 0.4rem;
+      text-align: left;
+    }
+    .input-group input,
+    .input-group select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      appearance: none;
+    }
+    .input-group select {
+      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%23333" d="M7 10l5 5 5-5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+    }
+    .input-group input:focus,
+    .input-group select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 5px rgba(255, 103, 0, 0.3);
+    }
+    .full-width {
+      grid-column: 1 / -1;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+    #signupForm button {
+      background-color: var(--primary-color);
+      color: var(--white-color);
+      border: none;
+      padding: 0.9rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      grid-column: 1 / -1;
+      margin-top: 0.5rem;
+    }
+    #signupMessage {
+      margin-top: 1rem;
+      font-weight: 500;
+      min-height: 1.2em;
+      text-align: center;
+      grid-column: 1 / -1;
+    }
+
+    /* 📱 Mobile Responsive */
+    @media (max-width: 600px) {
+      .auth-container {
+        padding: 1.5rem;
+      }
+      /* Adjust selector for mobile */
+      .language-selector {
+        top: 15px;
+        right: 15px;
+      }
+      .logo h1 {
+        font-size: 1.3rem;
+      }
+      .auth-container h2 {
+        font-size: 1.6rem;
+      }
+      #signupForm {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .input-group label {
+        font-size: 0.85rem;
+      }
+      .input-group input,
+      .input-group select {
+        font-size: 0.95rem;
+        padding: 0.7rem 0.9rem;
+      }
+      #signupForm button {
+        padding: 0.8rem;
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    
+    <div class="language-selector">
+        <label for="language-select" data-i18n="lang-label">Language:</label>
+        <select id="language-select">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="ml">മലയാളം (Malayalam)</option>
+            <option value="te">తెలుగు (Telugu)</option>
+            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+            <option value="bn">বাংলা (Bengali)</option>
+            <option value="mr">मराठी (Marathi)</option>
+        </select>
+    </div>
+    <div class="logo">
+      <img src="https://img.icons8.com/color/48/lotus.png" alt="Tourism Logo" />
+      <h1 data-i18n="app-title">Incredible India</h1>
+    </div>
+    <h2 data-i18n="create-account">Create an Account</h2>
+    <form id="signupForm" novalidate>
+      <div class="input-group">
+        <label for="username" data-i18n="label-username">Username</label>
+        <input type="text" id="username" required>
+      </div>
+      <div class="input-group">
+        <label for="email" data-i18n="label-email">Email ID</label>
+        <input type="email" id="email" required>
+      </div>
+      <div class="input-group">
+        <label for="password" data-i18n="label-password">Password</label>
+        <input type="password" id="password" required>
+        <img src="https://img.icons8.com/material-outlined/24/000000/visible--v1.png" class="toggle-password" id="togglePassword" alt="Toggle Password Visibility"/>
+      </div>
+      <div class="input-group">
+        <label for="confirmPassword" data-i18n="label-confirm-password">Confirm Password</label>
+        <input type="password" id="confirmPassword" required>
+        <img src="https://img.icons8.com/material-outlined/24/000000/visible--v1.png" class="toggle-password" id="toggleConfirmPassword" alt="Toggle Password Visibility"/>
+      </div>
+      <div class="input-group">
+        <label for="phone" data-i18n="label-phone">Phone Number</label>
+        <input type="tel" id="phone" placeholder="(Optional)">
+      </div>
+      <div class="input-group">
+        <label for="state" data-i18n="label-state">State</label>
+        <select id="state" required>
+          <option value="" disabled selected data-i18n="select-state">Select your state</option>
+          <option value="Jharkhand">Jharkhand</option>
+          <option value="Tamil Nadu">Tamil Nadu</option>
+          <option value="Maharashtra">Maharashtra</option>
+          <option value="Rajasthan">Rajasthan</option>
+          <option value="Uttar Pradesh">Uttar Pradesh</option>
+          <option value="Kerala">Kerala</option>
+          <option value="Delhi">Delhi</option>
+        </select>
+      </div>
+      <div class="input-group full-width">
+        <label for="dob" data-i18n="label-dob">Date of Birth</label>
+        <input type="text" id="dob" placeholder="Select date" data-i18n-placeholder="select-date" onfocus="(this.type='date')" onblur="(this.type='text')" required>
+      </div>
+      <button type="submit" data-i18n="btn-signup">Sign Up</button>
+      <p data-i18n="already-account">Already have an account? <a href="login.html" data-i18n="link-login">Login</a></p>
+      <div id="signupMessage"></div>
+    </form>
+  </div>
+
+  <script>
+    // --- START TRANSLATION SCRIPT ---
+
+    const translations = {
+      en: {
+        'lang-label': 'Language:',
+        'app-title': 'Incredible India',
+        'create-account': 'Create an Account',
+        'label-username': 'Username',
+        'label-email': 'Email ID',
+        'label-password': 'Password',
+        'label-confirm-password': 'Confirm Password',
+        'label-phone': 'Phone Number',
+        'label-state': 'State',
+        'select-state': 'Select your state',
+        'label-dob': 'Date of Birth',
+        'select-date': 'Select date',
+        'btn-signup': 'Sign Up',
+        'already-account': 'Already have an account?',
+        'link-login': 'Login',
+        'passwords-no-match': 'Passwords do not match.',
+        'signup-success': 'Success! Redirecting to login page...',
+        'unknown-error': 'An unknown error occurred.',
+        'server-error': 'Could not connect to the server.'
+      },
+      hi: {
+        'lang-label': 'भाषा:',
+        'app-title': 'अतुल्य भारत',
+        'create-account': 'खाता बनाएं',
+        'label-username': 'उपयोगकर्ता नाम',
+        'label-email': 'ईमेल आईडी',
+        'label-password': 'पासवर्ड',
+        'label-confirm-password': 'पासवर्ड की पुष्टि करें',
+        'label-phone': 'फ़ोन नंबर',
+        'label-state': 'राज्य',
+        'select-state': 'अपना राज्य चुनें',
+        'label-dob': 'जन्म की तारीख',
+        'select-date': 'तारीख चुनें',
+        'btn-signup': 'साइन अप करें',
+        'already-account': 'पहले से ही एक खाता है?',
+        'link-login': 'लॉग इन करें',
+        'passwords-no-match': 'पासवर्ड मेल नहीं खाते।',
+        'signup-success': 'सफलता! लॉगिन पेज पर रीडायरेक्ट किया जा रहा है...',
+        'unknown-error': 'एक अज्ञात त्रुटि हुई।',
+        'server-error': 'सर्वर से कनेक्ट नहीं हो सका।'
+      },
+      ta: {
+        'lang-label': 'மொழி:',
+        'app-title': 'நம்பமுடியாத இந்தியா',
+        'create-account': 'கணக்கை உருவாக்கவும்',
+        'label-username': 'பயனர் பெயர்',
+        'label-email': 'மின்னஞ்சல் ஐடி',
+        'label-password': 'கடவுச்சொல்',
+        'label-confirm-password': 'கடவுச்சொல்லை உறுதிப்படுத்தவும்',
+        'label-phone': 'தொலைபேசி எண்',
+        'label-state': 'மாநிலம்',
+        'select-state': 'உங்கள் மாநிலத்தைத் தேர்ந்தெடுக்கவும்',
+        'label-dob': 'பிறந்த தேதி',
+        'select-date': 'தேதியைத் தேர்ந்தெடுக்கவும்',
+        'btn-signup': 'பதிவு செய்க',
+        'already-account': 'ஏற்கனவே கணக்கு உள்ளதா?',
+        'link-login': 'உள்நுழைக',
+        'passwords-no-match': 'கடவுச்சொற்கள் பொருந்தவில்லை.',
+        'signup-success': 'வெற்றி! உள்நுழைவு பக்கத்திற்கு திருப்பி விடப்படுகிறது...',
+        'unknown-error': 'அறியப்படாத பிழை ஏற்பட்டது.',
+        'server-error': 'சேவையகத்துடன் இணைக்க முடியவில்லை.'
+      },
+      ml: {
+        'lang-label': 'ഭാഷ:',
+        'app-title': 'അവിശ്വസനീയമായ ഇന്ത്യ',
+        'create-account': 'അക്കൗണ്ട് ഉണ്ടാക്കുക',
+        'label-username': 'ഉപയോക്തൃനാമം',
+        'label-email': 'ഇമെയിൽ ഐഡി',
+        'label-password': 'പാസ്‌വേഡ്',
+        'label-confirm-password': 'പാസ്‌വേഡ് സ്ഥിരീകരിക്കുക',
+        'label-phone': 'ഫോൺ നമ്പർ',
+        'label-state': 'സംസ്ഥാനം',
+        'select-state': 'നിങ്ങളുടെ സംസ്ഥാനം തിരഞ്ഞെടുക്കുക',
+        'label-dob': 'ജനന തീയതി',
+        'select-date': 'തീയതി തിരഞ്ഞെടുക്കുക',
+        'btn-signup': 'സൈൻ അപ്പ് ചെയ്യുക',
+        'already-account': ' ഇതിനകം അക്കൗണ്ടുണ്ടോ?',
+        'link-login': 'ലോഗിൻ ചെയ്യുക',
+        'passwords-no-match': 'പാസ്‌വേഡുകൾ പൊരുത്തപ്പെടുന്നില്ല.',
+        'signup-success': 'വിജയം! ലോഗിൻ പേജിലേക്ക് റീഡയറക്ട് ചെയ്യുന്നു...',
+        'unknown-error': 'അജ്ഞാതമായ ഒരു പിശക് സംഭവിച്ചു.',
+        'server-error': 'സെർവറുമായി ബന്ധിപ്പിക്കാൻ കഴിഞ്ഞില്ല.'
+      },
+      te: {
+        'lang-label': 'భాష:',
+        'app-title': 'అవిశ్వసనీయమైన భారతదేశం',
+        'create-account': 'ఖాతాను సృష్టించండి',
+        'label-username': 'యూజర్ పేరు',
+        'label-email': 'ఇమెయిల్ ID',
+        'label-password': 'పాస్‌వర్డ్',
+        'label-confirm-password': 'పాస్‌వర్డ్‌ను నిర్ధారించండి',
+        'label-phone': 'ఫోన్ నంబర్',
+        'label-state': 'రాష్ట్రం',
+        'select-state': 'మీ రాష్ట్రాన్ని ఎంచుకోండి',
+        'label-dob': 'పుట్టిన తేది',
+        'select-date': 'తేదీని ఎంచుకోండి',
+        'btn-signup': 'నమోదు చేసుకోండి',
+        'already-account': 'ఇప్పటికే ఖాతా ఉందా?',
+        'link-login': 'లాగిన్',
+        'passwords-no-match': 'పాస్‌వర్డ్‌లు సరిపోలడం లేదు.',
+        'signup-success': 'విజయం! లాగిన్ పేజీకి మళ్లిస్తోంది...',
+        'unknown-error': 'తెలియని లోపం సంభవించింది.',
+        'server-error': 'సర్వర్‌కు కనెక్ట్ కాలేదు.'
+      },
+      kn: {
+        'lang-label': 'ಭಾಷೆ:',
+        'app-title': 'ಅದ್ಭುತ ಭಾರತ',
+        'create-account': 'ಖಾತೆ ತೆರೆಯಿರಿ',
+        'label-username': 'ಬಳಕೆದಾರ ಹೆಸರು',
+        'label-email': 'ಇಮೇಲ್ ಐಡಿ',
+        'label-password': 'ಗುಪ್ತಪದ',
+        'label-confirm-password': 'ಗುಪ್ತಪದವನ್ನು ದೃಢಪಡಿಸಿ',
+        'label-phone': 'ದೂರವಾಣಿ ಸಂಖ್ಯೆ',
+        'label-state': 'ರಾಜ್ಯ',
+        'select-state': 'ನಿಮ್ಮ ರಾಜ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+        'label-dob': 'ಹುಟ್ತಿದ ದಿನ',
+        'select-date': 'ದಿನಾಂಕ ಆಯ್ಕೆಮಾಡಿ',
+        'btn-signup': 'ಸೈನ್ ಅಪ್ ಮಾಡಿ',
+        'already-account': 'ಈಗಾಗಲೇ ಖಾತೆ ಹೊಂದಿದ್ದೀರಾ?',
+        'link-login': 'ಲಾಗಿನ್ ಮಾಡಿ',
+        'passwords-no-match': 'ಪಾಸ್ವರ್ಡ್ಗಳು ಹೊಂದಿಕೆಯಾಗುವುದಿಲ್ಲ.',
+        'signup-success': 'ಯಶಸ್ಸು! ಲಾಗಿನ್ ಪುಟಕ್ಕೆ ಮರುನಿರ್ದೇಶಿಸಲಾಗುತ್ತಿದೆ...',
+        'unknown-error': 'ಅജ്ഞಾತ ದೋಷ ಸಂಭವಿಸಿದೆ.',
+        'server-error': 'ಸರ್ವರ್‌ಗೆ ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.'
+      },
+      bn: {
+        'lang-label': 'ভাষা:',
+        'app-title': 'অবিশ্বাস্য ভারত',
+        'create-account': 'অ্যাকাউন্ট তৈরি করুন',
+        'label-username': 'ব্যবহারকারীর নাম',
+        'label-email': 'ইমেইল আইডি',
+        'label-password': 'পাসওয়ার্ড',
+        'label-confirm-password': 'পাসওয়ার্ড নিশ্চিত করুন',
+        'label-phone': 'ফোন নম্বর',
+        'label-state': 'রাজ্য',
+        'select-state': 'আপনার রাজ্য নির্বাচন করুন',
+        'label-dob': 'জন্ম তারিখ',
+        'select-date': 'তারিখ নির্বাচন করুন',
+        'btn-signup': 'সাইন আপ করুন',
+        'already-account': 'ইতিমধ্যে একটি অ্যাকাউন্ট আছে?',
+        'link-login': 'লগইন করুন',
+        'passwords-no-match': 'পাসওয়ার্ড মিলছে না।',
+        'signup-success': 'সাফল্য! লগইন পৃষ্ঠায় পুনঃনির্দেশিত করা হচ্ছে...',
+        'unknown-error': 'একটি অজানা ত্রুটি ঘটেছে।',
+        'server-error': 'সার্ভারের সাথে সংযোগ করা যায়নি।'
+      },
+      mr: {
+        'lang-label': 'भाषा:',
+        'app-title': 'अतुल्य भारत',
+        'create-account': 'नवीन खाते तयार करा',
+        'label-username': 'वापरकर्ता नाव',
+        'label-email': 'ईमेल आयडी',
+        'label-password': 'पासवर्ड',
+        'label-confirm-password': 'पासवर्डची पुष्टी करा',
+        'label-phone': 'फोन नंबर',
+        'label-state': 'राज्य',
+        'select-state': 'तुमचे राज्य निवडा',
+        'label-dob': 'जन्म तारीख',
+        'select-date': 'तारीख निवडा',
+        'btn-signup': 'साइन अप करा',
+        'already-account': 'आधीपासूनच खाते आहे?',
+        'link-login': 'लॉगिन करा',
+        'passwords-no-match': 'पासवर्ड जुळत नाहीत.',
+        'signup-success': 'यशस्वी! लॉगिन पृष्ठावर पुनर्निर्देशित करत आहे...',
+        'unknown-error': 'एक अज्ञात त्रुटी आली.',
+        'server-error': 'सर्व्हरशी कनेक्ट होऊ शकले नाही.'
+      }
+    };
+
+    const updateContent = (lang) => {
+        const currentTranslations = translations[lang];
+
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            const key = element.getAttribute('data-i18n');
+            if (currentTranslations[key]) {
+                
+                if (key === 'already-account') {
+                     const linkKey = element.querySelector('a').getAttribute('data-i18n');
+                     const textBeforeLink = currentTranslations['already-account'] + ' ';
+                     const linkHtml = `<a href="login.html" data-i18n="${linkKey}">${currentTranslations['link-login']}</a>`;
+                     element.innerHTML = textBeforeLink + linkHtml;
+                } else if (key === 'link-login') {
+                    // Handled by 'already-account'
+                } else {
+                    element.textContent = currentTranslations[key];
+                }
+            }
+        });
+
+        // Handle placeholders
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+            const key = element.getAttribute('data-i18n-placeholder');
+            if (currentTranslations[key]) {
+                element.placeholder = currentTranslations[key];
+            }
+        });
+        
+        // Update Title
+        document.title = currentTranslations['btn-signup'] + ' | ' + currentTranslations['app-title'];
+    };
+
+    // --- END TRANSLATION SCRIPT ---
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const backendUrl = 'http://localhost:5000';
+      
+      // --- Language Selector Logic ---
+      const languageSelect = document.getElementById('language-select');
+      updateContent('en'); // Set initial language
+      
+      languageSelect.addEventListener('change', (e) => {
+          updateContent(e.target.value);
+      });
+      // --- End Language Logic ---
+
+
+      function setupPasswordToggle(inputId, toggleId) {
+        const passwordInput = document.getElementById(inputId);
+        const toggleIcon = document.getElementById(toggleId);
+        toggleIcon.addEventListener('click', () => {
+          const isPassword = passwordInput.type === 'password';
+          passwordInput.type = isPassword ? 'text' : 'password';
+          toggleIcon.src = isPassword 
+            ? "https://img.icons8.com/material-outlined/24/000000/invisible--v1.png" 
+            : "https://img.icons8.com/material-outlined/24/000000/visible--v1.png";
+        });
+      }
+      setupPasswordToggle('password', 'togglePassword');
+      setupPasswordToggle('confirmPassword', 'toggleConfirmPassword');
+
+      const signupForm = document.getElementById('signupForm');
+      signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const signupMessage = document.getElementById('signupMessage');
+        const currentLang = languageSelect.value;
+        const currentTranslations = translations[currentLang]; // Get current translations
+        
+        signupMessage.textContent = '';
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+          signupMessage.textContent = currentTranslations['passwords-no-match']; // Translated error
+          signupMessage.style.color = 'red';
+          return;
+        }
+
+        const userData = {
+          username: document.getElementById('username').value,
+          email: document.getElementById('email').value,
+          state: document.getElementById('state').value,
+          phone: document.getElementById('phone').value,
+          dob: document.getElementById('dob').value,
+          password: password
+        };
+
+        try {
+          const response = await fetch(`${backendUrl}/api/auth/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            signupMessage.textContent = currentTranslations['signup-success']; // Translated success
+            signupMessage.style.color = 'green';
+            setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+          } else {
+            signupMessage.textContent = result.message || currentTranslations['unknown-error']; // Translated error
+            signupMessage.style.color = 'red';
+          }
+        } catch (error) {
+          signupMessage.textContent = currentTranslations['server-error']; // Translated error
+          signupMessage.style.color = 'red';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

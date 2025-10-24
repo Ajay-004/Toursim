@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Incredible India</title> <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #ff6700;
+            --secondary-color: #046A38;
+            --text-color: #333;
+            --white-color: #ffffff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://i.imgur.com/Bq5D5t8.jpeg') no-repeat center center;
+            background-size: cover;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column; /* mobile first: stack top-bottom */
+            width: 100%;
+            max-width: 450px;
+            background: var(--white-color);
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+            margin: 1rem;
+        }
+
+        .right-panel, .left-panel {
+            width: 100%;
+            padding: 2rem 1.5rem;
+        }
+
+        /* --- Right Panel (Info Panel) --- */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-color: white;
+            position: relative; /* Needed for absolute positioning of language selector */
+        }
+
+        .features-showcase .logo-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+        .features-showcase .logo-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0;
+        }
+
+        .features-showcase p {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            color: #555;
+        }
+
+        .feature-display {
+            position: relative;
+            height: 100px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .feature-item {
+            position: absolute; top: 0; left: 0; width: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        /* Right-to-Left Animation */
+        @keyframes feature1 { 0% { opacity: 0; transform: translateX(100%); } 6.66% { opacity: 1; transform: translateX(0); } 26.66% { opacity: 1; transform: translateX(0); } 33.33% { opacity: 0; transform: translateX(-100%); } 100% { opacity: 0; transform: translateX(100%); } }
+        @keyframes feature2 { 0% { opacity: 0; transform: translateX(100%); } 33.33% { opacity: 0; transform: translateX(100%); } 39.99% { opacity: 1; transform: translateX(0); } 59.99% { opacity: 1; transform: translateX(0); } 66.66% { opacity: 0; transform: translateX(-100%); } 100% { opacity: 0; transform: translateX(100%); } }
+        @keyframes feature3 { 0% { opacity: 0; transform: translateX(100%); } 66.66% { opacity: 0; transform: translateX(100%); } 73.32% { opacity: 1; transform: translateX(0); } 93.32% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(-100%); } }
+
+        .feature-item:nth-child(1) { animation: feature1 15s ease-in-out infinite; }
+        .feature-item:nth-child(2) { animation: feature2 15s ease-in-out infinite; }
+        .feature-item:nth-child(3) { animation: feature3 15s ease-in-out infinite; }
+
+        .feature-item svg { width: 50px; height: 50px; color: var(--secondary-color); margin-bottom: 0.5rem; }
+        .feature-item h3 { font-size: 1.3rem; color: var(--secondary-color); }
+
+        /* --- Left Panel (Login Form) --- */
+        .left-panel {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: relative; /* Keep for potential future elements */
+        }
+
+        /* --- Language Selector Styling --- */
+        .language-selector {
+            position: absolute;
+            top: 15px; /* Mobile gap */
+            right: 15px;
+            display: flex; align-items: center; gap: 5px;
+            font-size: 0.8rem; font-weight: 500;
+            z-index: 2; /* Ensure it's above feature showcase if needed */
+        }
+        #language-select {
+            padding: 0.3rem 0.5rem; border-radius: 5px; border: 1px solid #ccc;
+            font-family: inherit;
+        }
+
+        .login-container { width: 100%; text-align: center; }
+        .login-container h2 { font-size: 1.8rem; color: var(--primary-color); margin-bottom: 1.2rem; margin-top: 30px; /* Add margin to avoid selector overlap on mobile*/}
+        .login-form { display: flex; flex-direction: column; gap: 1.2rem; margin-top: 2rem; text-align: left; }
+        .input-group label { font-weight: 600; margin-bottom: 0.5rem; display: block; }
+        .login-form .input-group input { width: 100%; padding: 0.8rem 1rem; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
+        .login-form button {
+            background-color: var(--primary-color); color: var(--white-color); border: none; padding: 1rem;
+            font-size: 1.1rem; font-weight: 600; border-radius: 8px; cursor: pointer; margin-top: 1rem;
+        }
+        .message { margin-top: 1rem; font-weight: 500; min-height: 1.2em; color: red; }
+        .switch-auth { margin-top: 1.5rem; font-size: 0.95rem; }
+        .switch-auth a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+
+        /* --- Larger Screens: Show side by side --- */
+        @media (min-width: 992px) {
+            .main-container { flex-direction: row; max-width: 900px; }
+            .right-panel, .left-panel { width: 50%; padding: 3rem; }
+             .language-selector {
+                top: 25px; /* Web gap */
+                right: 30px;
+            }
+             .features-showcase { margin-top: 40px; } /* Push down features on web */
+             .login-container h2 { margin-top: 0; } /* Reset top margin for login title on web */
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+
+        <div class="right-panel">
+            <div class="language-selector">
+                <label for="language-select" data-i18n="lang-label">Language:</label>
+                <select id="language-select">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                    <option value="ml">മലയാളം (Malayalam)</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                    <option value="bn">বাংলা (Bengali)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                </select>
+            </div>
+            <div class="features-showcase">
+                <div class="logo-header">
+                    <img src="https://img.icons8.com/color/48/lotus.png" alt="Tourism Logo" />
+                    <h1 data-i18n="app-title">Incredible India</h1>
+                </div>
+                <p data-i18n="tagline">Your personal guide to the wonders of India.</p>
+                <div class="feature-display">
+                    <div class="feature-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 16.382V5.618a1 1 0 00-.553-.894L15 2m0 18V2m0 0l-6 3m6-3l6 3" /></svg>
+                        <h3 data-i18n="feature-map">AI-Powered Map</h3>
+                    </div>
+                    <div class="feature-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                        <h3 data-i18n="feature-planner">Smart Trip Planner</h3>
+                    </div>
+                    <div class="feature-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        <h3 data-i18n="feature-finder">Tourist Place Finder</h3> </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="left-panel">
+            <div class="login-container">
+                <h2 data-i18n="welcome-back">Welcome Back!</h2>
+                <form class="login-form" id="loginForm">
+                    <div class="input-group">
+                        <label for="username" data-i18n="label-username">Username</label>
+                        <input type="text" id="username" required />
+                    </div>
+                    <div class="input-group">
+                        <label for="password" data-i18n="label-password">Password</label>
+                        <input type="password" id="password" required />
+                    </div>
+                    <button type="submit" data-i18n="btn-login">Login</button>
+                    <p class="message" id="loginMessage"></p>
+                </form>
+                <p class="switch-auth" data-i18n="no-account">Don't have an account? <a href="signup.html" data-i18n="link-signup">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Translation Data ---
+        const translations = {
+            en: {
+                'lang-label': 'Language:', 'app-title': 'Incredible India', 'tagline': 'Your personal guide to the wonders of India.',
+                'feature-map': 'AI-Powered Map', 'feature-planner': 'Smart Trip Planner', 'feature-finder': 'Tourist Place Finder',
+                'welcome-back': 'Welcome Back!', 'label-username': 'Username', 'label-password': 'Password', 'btn-login': 'Login',
+                'no-account': "Don't have an account?", 'link-signup': 'Sign Up',
+                'login-failed-default': 'Login failed.', 'network-error': 'Network error. Please try again.',
+                'title-login': 'Login | Incredible India' // Added title key
+            },
+            hi: {
+                'lang-label': 'भाषा:', 'app-title': 'अतुल्य भारत', 'tagline': 'भारत के चमत्कारों के लिए आपका व्यक्तिगत मार्गदर्शक।',
+                'feature-map': 'एआई-संचालित मानचित्र', 'feature-planner': 'स्मार्ट यात्रा योजनाकार', 'feature-finder': 'पर्यटक स्थल खोजक',
+                'welcome-back': 'वापस स्वागत है!', 'label-username': 'उपयोगकर्ता नाम', 'label-password': 'पासवर्ड', 'btn-login': 'लॉग इन करें',
+                'no-account': 'खाता नहीं है?', 'link-signup': 'साइन अप करें',
+                'login-failed-default': 'लॉगिन विफल।', 'network-error': 'नेटवर्क त्रुटि। कृपया पुन: प्रयास करें।',
+                'title-login': 'लॉगिन | अतुल्य भारत'
+            },
+            ta: {
+                'lang-label': 'மொழி:', 'app-title': 'நம்பமுடியாத இந்தியா', 'tagline': 'இந்தியாவின் அதிசயங்களுக்கு உங்கள் தனிப்பட்ட வழிகாட்டி.',
+                'feature-map': 'AI-இயங்கும் வரைபடம்', 'feature-planner': 'ஸ்மார்ட் பயணத் திட்டமிடுபவர்', 'feature-finder': 'சுற்றுலா இட கண்டுபிடிப்பாளர்',
+                'welcome-back': 'மீண்டும் வருக!', 'label-username': 'பயனர் பெயர்', 'label-password': 'கடவுச்சொல்', 'btn-login': 'உள்நுழை',
+                'no-account': 'உங்களுக்கு கணக்கு இல்லையா?', 'link-signup': 'பதிவு செய்க',
+                'login-failed-default': 'உள்நுழைவு தோல்வியடைந்தது.', 'network-error': 'பிணையப் பிழை. மீண்டும் முயற்சிக்கவும்.',
+                'title-login': 'உள்நுழை | நம்பமுடியாத இந்தியா'
+            },
+            ml: {
+                'lang-label': 'ഭാഷ:', 'app-title': 'അവിശ്വസനീയമായ ഇന്ത്യ', 'tagline': 'ഇന്ത്യയുടെ അത്ഭുതങ്ങളിലേക്കുള്ള നിങ്ങളുടെ വ്യക്തിപരമായ വഴികാട്ടി.',
+                'feature-map': 'AI-പവർഡ് മാപ്പ്', 'feature-planner': 'സ്മാർട്ട് ട്രിപ്പ് പ്ലാനർ', 'feature-finder': 'ടൂറിസ്റ്റ് പ്ലേസ് ഫൈൻഡർ',
+                'welcome-back': 'സ്വാഗതം!', 'label-username': 'ഉപയോക്തൃനാമം', 'label-password': 'പാസ്‌വേഡ്', 'btn-login': 'പ്രവേശിക്കുക',
+                'no-account': 'അക്കൗണ്ട് ഇല്ലേ?', 'link-signup': 'സൈൻ അപ്പ് ചെയ്യുക',
+                'login-failed-default': 'ലോഗിൻ പരാജയപ്പെട്ടു.', 'network-error': 'നെറ്റ്‌വർക്ക് പിശക്. ദയവായി വീണ്ടും ശ്രമിക്കുക.',
+                'title-login': 'പ്രവേശിക്കുക | അവിശ്വസനീയമായ ഇന്ത്യ'
+            },
+            te: {
+                'lang-label': 'భాష:', 'app-title': 'అవిశ్వసనీయమైన భారతదేశం', 'tagline': 'భారతదేశ అద్భుతాల కోసం మీ వ్యక్తిగత గైడ్.',
+                'feature-map': 'AI-ఆధారిత మ్యాప్', 'feature-planner': 'స్మార్ట్ ట్రిప్ ప్లానర్', 'feature-finder': 'పర్యాటక స్థల ఫైండర్',
+                'welcome-back': 'తిరిగి స్వాగతం!', 'label-username': 'యూజర్ పేరు', 'label-password': 'పాస్‌వర్డ్', 'btn-login': 'లాగిన్',
+                'no-account': 'మీకు ఖాతా లేదా?', 'link-signup': 'సైన్ అప్ చేయండి',
+                'login-failed-default': 'లాగిన్ విఫలమైంది.', 'network-error': 'నెట్‌వర్క్ లోపం. దయచేసి మళ్లీ ప్రయత్నించండి.',
+                'title-login': 'లాగిన్ | అవిశ్వసనీయమైన భారతదేశం'
+            },
+            kn: {
+                'lang-label': 'ಭಾಷೆ:', 'app-title': 'ಅದ್ಭುತ ಭಾರತ', 'tagline': 'ಭಾರತದ ಅದ್ಭುತಗಳಿಗೆ ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಮಾರ್ಗದರ್ಶಿ.',
+                'feature-map': 'AI-ಚಾಲಿತ ನಕ್ಷೆ', 'feature-planner': 'ಸ್ಮಾರ್ಟ್ ಟ್ರಿಪ್ ಪ್ಲಾನರ್', 'feature-finder': 'ಪ್ರವಾಸಿ ಸ್ಥಳ ಶೋಧಕ',
+                'welcome-back': 'ಮರಳಿ ಸ್ವಾಗತ!', 'label-username': 'ಬಳಕೆದಾರ ಹೆಸರು', 'label-password': 'ಗುಪ್ತಪದ', 'btn-login': 'ಲಾಗಿನ್',
+                'no-account': 'ಖಾತೆ ಇಲ್ಲವೇ?', 'link-signup': 'ಸೈನ್ ಅಪ್ ಮಾಡಿ',
+                'login-failed-default': 'ಲಾಗಿನ್ ವಿಫಲವಾಗಿದೆ.', 'network-error': 'ನೆಟ್‌ವರ್ಕ್ ದೋಷ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+                'title-login': 'ಲಾಗಿನ್ | ಅದ್ಭುತ ಭಾರತ'
+            },
+            bn: {
+                'lang-label': 'ভাষা:', 'app-title': 'অবিশ্বাস্য ভারত', 'tagline': 'ভারতের বিস্ময়গুলির জন্য আপনার ব্যক্তিগত গাইড।',
+                'feature-map': 'এআই-চালিত মানচিত্র', 'feature-planner': 'স্মার্ট ট্রিপ প্ল্যানার', 'feature-finder': 'পর্যটন স্থান ফাইন্ডার',
+                'welcome-back': 'স্বাগতম!', 'label-username': 'ব্যবহারকারীর নাম', 'label-password': 'পাসওয়ার্ড', 'btn-login': 'লগইন',
+                'no-account': 'অ্যাকাউন্ট নেই?', 'link-signup': 'সাইন আপ করুন',
+                'login-failed-default': 'লগইন ব্যর্থ হয়েছে।', 'network-error': 'নেটওয়ার্ক ত্রুটি। আবার চেষ্টা করুন।',
+                'title-login': 'লগইন | অবিশ্বাস্য ভারত'
+            },
+            mr: {
+                'lang-label': 'भाषा:', 'app-title': 'अतुल्य भारत', 'tagline': 'भारताच्या चमत्कारांसाठी तुमचा वैयक्तिक मार्गदर्शक.',
+                'feature-map': 'एआय-शक्तीचे नकाशे', 'feature-planner': 'स्मार्ट ट्रिप प्लॅनर', 'feature-finder': 'पर्यटन स्थळ शोधक',
+                'welcome-back': 'परत स्वागत आहे!', 'label-username': 'वापरकर्ता नाव', 'label-password': 'पासवर्ड', 'btn-login': 'लॉगिन करा',
+                'no-account': 'खाते नाही?', 'link-signup': 'साइन अप करा',
+                'login-failed-default': 'लॉगिन अयशस्वी.', 'network-error': 'नेटवर्क त्रुटी. कृपया पुन्हा प्रयत्न करा.',
+                'title-login': 'लॉगिन | अतुल्य भारत'
+            }
+        };
+
+        const updateContent = (lang) => {
+            const currentTranslations = translations[lang];
+            if (!currentTranslations) return; // Exit if language not found
+
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (currentTranslations[key]) {
+                    // Special handling for the 'no-account' structure
+                    if (key === 'no-account') {
+                         const linkKey = element.querySelector('a')?.getAttribute('data-i18n'); // Use optional chaining
+                         if (linkKey) {
+                             const textBeforeLink = currentTranslations['no-account'] + ' ';
+                             const linkHtml = `<a href="signup.html" data-i18n="${linkKey}">${currentTranslations['link-signup']}</a>`;
+                             element.innerHTML = textBeforeLink + linkHtml;
+                         } else {
+                              element.textContent = currentTranslations[key]; // Fallback if no link found
+                         }
+                    } else if (key === 'link-signup') {
+                        // Handled by 'no-account'
+                    } else {
+                        element.textContent = currentTranslations[key];
+                    }
+                }
+            });
+
+            // Clear dynamic messages on language switch
+            const loginMessage = document.getElementById('loginMessage');
+            if(loginMessage) loginMessage.textContent = '';
+
+            // Update Page Title
+            document.title = currentTranslations['title-login'];
+        };
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const backendUrl = 'http://localhost:5000'; // Make sure this matches your backend
+            const loginForm = document.getElementById('loginForm');
+            const loginMessage = document.getElementById('loginMessage');
+            const languageSelect = document.getElementById('language-select');
+
+            updateContent('en'); // Set initial language
+
+            languageSelect.addEventListener('change', (e) => {
+                updateContent(e.target.value);
+            });
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const currentLang = languageSelect.value;
+                const currentTranslations = translations[currentLang] || translations.en; // Fallback to English
+
+                try {
+                    const response = await fetch(`${backendUrl}/api/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        localStorage.setItem('token', result.token);
+                        sessionStorage.setItem('justLoggedIn', 'true'); // Optional flag for welcome message on index page
+                        window.location.href = 'index.html';
+                    } else {
+                        loginMessage.textContent = result.message || currentTranslations['login-failed-default'];
+                    }
+                } catch (error) {
+                    console.error("Login Error:", error);
+                    loginMessage.textContent = currentTranslations['network-error'];
+                }
+            });
+        });
+    </script>
+</body>
+</html>
