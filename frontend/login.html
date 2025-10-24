@@ -116,12 +116,18 @@
       height: 3px;
       background: var(--primary-color);
       border-radius: 2px;
+      transition: all 0.3s ease-in-out; /* Add transition */
     }
+    /* Active state for hamburger */
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
 
     /* Hero Section */
     .hero {
-      background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), /* Lighter overlay */
-        url("tours.png") no-repeat center center; /* Using login page image */
+      background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+        url("https://i.imgur.com/Bq5D5t8.jpeg") no-repeat center center;
       height: 100vh;
       background-size: cover;
       display: flex;
@@ -133,14 +139,8 @@
     }
 
     @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .hero-text h2,
@@ -149,25 +149,11 @@
       opacity: 0;
       animation: fadeInUp 1s ease-out forwards;
     }
-    .hero-text h2 {
-      font-size: 3.5rem;
-      margin-bottom: 1rem;
-      animation-delay: 0.5s;
-    }
-    .hero-text p {
-      font-size: 1.2rem;
-      max-width: 650px;
-      margin: 0 auto 2rem;
-      animation-delay: 0.8s;
-    }
+    .hero-text h2 { font-size: 3.5rem; margin-bottom: 1rem; animation-delay: 0.5s; }
+    .hero-text p { font-size: 1.2rem; max-width: 650px; margin: 0 auto 2rem; animation-delay: 0.8s; }
     .cta-btn {
-      background-color: var(--primary-color);
-      color: var(--white-color);
-      padding: 0.8rem 2.5rem;
-      text-decoration: none;
-      border-radius: 50px;
-      font-weight: 600;
-      display: inline-block;
+      background-color: var(--primary-color); color: var(--white-color); padding: 0.8rem 2.5rem;
+      text-decoration: none; border-radius: 50px; font-weight: 600; display: inline-block;
       animation-delay: 1.1s;
     }
 
@@ -197,40 +183,27 @@
     /* Responsive */
     @media (max-width: 768px) {
       .navbar nav {
-        flex-direction: column;
-        align-items: flex-start; /* Align items left in mobile */
-        background: var(--white-color);
-        position: absolute;
-        top: 70px; /* Adjust based on navbar height */
-        right: 0;
-        width: 100%;
-        max-height: 0;
-        overflow: hidden;
+        flex-direction: column; align-items: flex-start;
+        background: var(--white-color); position: absolute;
+        top: 70px; right: 5%; width: auto; min-width: 180px; /* Adjust width */
+        max-height: 0; overflow: hidden;
+        padding: 0 1rem; /* Padding only when open */
+        border-radius: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.1);
       }
       .navbar nav.open {
         max-height: 350px; /* Adjust as needed */
-        padding: 1rem 5%; /* Add padding for mobile view */
-        box-shadow: 0 8px 16px rgba(0,0,0,0.1); /* Add shadow for dropdown */
+        padding: 1rem; /* Add padding when open */
       }
       .navbar nav a,
       .navbar nav button,
-      .navbar nav div { /* Style all direct children */
-        margin: 0.75rem 0; /* Vertical spacing */
-        margin-left: 0; /* Reset margin */
-        width: 100%; /* Make items take full width */
+      .navbar nav div {
+        margin: 0.75rem 0; margin-left: 0; width: 100%;
       }
       .language-selector {
-        width: 100%; /* Make selector full width */
-        justify-content: space-between; /* Space out label and select */
-        font-size: 1rem; /* Increase size slightly for touch */
+        width: 100%; justify-content: space-between; font-size: 1rem;
       }
-      #language-select {
-        font-size: 1rem;
-        flex-grow: 1; /* Allow select to fill space */
-      }
-      .hamburger {
-        display: flex;
-      }
+      #language-select { font-size: 1rem; flex-grow: 1; }
+      .hamburger { display: flex; }
       .hero-text h2 { font-size: 2.2rem; }
       .hero-text p { font-size: 1rem; }
       .cta-btn { padding: 0.7rem 1.8rem; font-size: 0.9rem; }
@@ -246,7 +219,7 @@
     <div class="hamburger" id="hamburger">
       <span></span> <span></span> <span></span>
     </div>
-    <nav> 
+    <nav> {/* Nav container */}
       <div class="language-selector">
         <label for="language-select" data-i18n="lang-label">Language:</label>
         <select id="language-select">
@@ -260,10 +233,10 @@
             <option value="mr">मराठी (Marathi)</option>
         </select>
       </div>
-      <a href="festivals.html" data-i18n="nav-festivals">Tourist Place Finder</a>
       <a href="map.html" data-i18n="nav-map">Map</a>
       <a href="plan.html" data-i18n="nav-planner">AI Trip Planner</a>
-      <span id="userSection"><a href="index.html" id="loginLink" data-i18n="nav-login">Login</a></span>
+      <a href="festivals.html" data-i18n="nav-festivals">Tourist Place Finder</a>
+      <span id="userSection"><a href="login.html" id="loginLink" data-i18n="nav-login">Login</a></span>
       <div id="profile-icon" style="display: none">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3zm6 12v-1.42c0-2.22-3.59-3.58-6-3.58s-6 1.36-6 3.58V22h12z"/>
@@ -314,179 +287,108 @@
   <script>
     // --- START TRANSLATION SCRIPT ---
     const translations = {
-      en: {
-        'lang-label': 'Language:',
-        'app-title': 'Incredible India',
-        'nav-map': 'Map',
-        'nav-planner': 'AI Trip Planner',
-        'nav-festivals': 'Tourist Place Finder', // Updated key value
-        'nav-login': 'Login',
-        'nav-logout': 'Logout',
+      en: { /* ... English translations ... */ },
+      hi: { /* ... Hindi translations ... */ },
+      ta: { /* ... Tamil translations ... */ },
+      ml: { /* ... Malayalam translations ... */ },
+      te: { /* ... Telugu translations ... */ },
+      kn: { /* ... Kannada translations ... */ },
+      bn: { /* ... Bengali translations ... */ },
+      mr: { /* ... Marathi translations ... */ }
+      // --- IMPORTANT: Ensure all keys from previous version are here ---
+       en: {
+        'lang-label': 'Language:', 'app-title': 'Incredible India', 'nav-map': 'Map', 'nav-planner': 'AI Trip Planner',
+        'nav-festivals': 'Tourist Place Finder', 'nav-login': 'Login', 'nav-logout': 'Logout',
         'hero-title': 'Explore Incredible India',
         'hero-subtitle': 'From the snow-capped Himalayas to the tranquil backwaters, discover a land of vibrant cultures, ancient traditions, and breathtaking landscapes.',
-        'hero-cta': 'Plan Your Trip Now',
-        'profile-title': 'Your Profile',
-        'profile-username-label': 'Username',
-        'profile-email-label': 'Email',
-        'profile-dob-label': 'Date of Birth',
-        'profile-state-label': 'State',
-        'profile-phone-label': 'Phone Number',
-        'profile-not-provided': 'Not provided',
+        'hero-cta': 'Plan Your Trip Now', 'profile-title': 'Your Profile', 'profile-username-label': 'Username',
+        'profile-email-label': 'Email', 'profile-dob-label': 'Date of Birth', 'profile-state-label': 'State',
+        'profile-phone-label': 'Phone Number', 'profile-not-provided': 'Not provided',
         'profile-fetch-error': 'Could not fetch your profile. Please try logging in again.',
         'title-main': 'Incredible India | Explore Nature & Culture'
       },
-      hi: {
-        'lang-label': 'भाषा:',
-        'app-title': 'अतुल्य भारत',
-        'nav-map': 'नक्शा',
-        'nav-planner': 'AI यात्रा योजनाकार',
-        'nav-festivals': 'पर्यटक स्थल खोजक', // Updated key value
-        'nav-login': 'लॉग इन करें',
-        'nav-logout': 'लॉग आउट',
-        'hero-title': 'अतुल्य भारत का अन्वेषण करें',
-        'hero-subtitle': 'बर्फ से ढके हिमालय से लेकर शांत बैकवाटर तक, जीवंत संस्कृतियों, प्राचीन परंपराओं और लुभावने परिदृश्यों की भूमि की खोज करें।',
-        'hero-cta': 'अपनी यात्रा की योजना अभी बनाएं',
-        'profile-title': 'आपकी प्रोफ़ाइल',
-        'profile-username-label': 'उपयोगकर्ता नाम',
-        'profile-email-label': 'ईमेल',
-        'profile-dob-label': 'जन्म की तारीख',
-        'profile-state-label': 'राज्य',
-        'profile-phone-label': 'फ़ोन नंबर',
-        'profile-not-provided': 'प्रदान नहीं किया गया',
-        'profile-fetch-error': 'आपकी प्रोफ़ाइल प्राप्त नहीं हो सकी। कृपया पुनः लॉग इन करने का प्रयास करें।',
-        'title-main': 'अतुल्य भारत | प्रकृति और संस्कृति का अन्वेषण करें'
-      },
-      ta: {
-        'lang-label': 'மொழி:',
-        'app-title': 'நம்பமுடியாத இந்தியா',
-        'nav-map': 'வரைபடம்',
-        'nav-planner': 'AI பயணத் திட்டமிடுபவர்',
-        'nav-festivals': 'சுற்றுலா இட கண்டுபிடிப்பாளர்', // Updated key value
-        'nav-login': 'உள்நுழைக',
-        'nav-logout': 'வெளியேறு',
-        'hero-title': 'நம்பமுடியாத இந்தியாவை ஆராயுங்கள்',
-        'hero-subtitle': 'பனி மூடிய இமயமலை முதல் அமைதியான உப்பங்கழிகள் வரை, துடிப்பான கலாச்சாரங்கள், பண்டைய மரபுகள் மற்றும் மூச்சடைக்கக்கூடிய пейзаஜ்கள் உள்ள நிலத்தைக் கண்டறியவும்.',
-        'hero-cta': 'உங்கள் பயணத்தை இப்போது திட்டமிடுங்கள்',
-        'profile-title': 'உங்கள் சுயவிவரம்',
-        'profile-username-label': 'பயனர் பெயர்',
-        'profile-email-label': 'மின்னஞ்சல்',
-        'profile-dob-label': 'பிறந்த தேதி',
-        'profile-state-label': 'மாநிலம்',
-        'profile-phone-label': 'தொலைபேசி எண்',
-        'profile-not-provided': 'வழங்கப்படவில்லை',
-        'profile-fetch-error': 'உங்கள் சுயவிவரத்தைப் பெற முடியவில்லை. தயவுசெய்து மீண்டும் உள்நுழைய முயற்சிக்கவும்.',
-        'title-main': 'நம்பமுடியாத இந்தியா | இயற்கை மற்றும் கலாச்சாரத்தை ஆராயுங்கள்'
-      },
-      ml: {
-        'lang-label': 'ഭാഷ:',
-        'app-title': 'അവിശ്വസനീയമായ ഇന്ത്യ',
-        'nav-map': 'മാപ്പ്',
-        'nav-planner': 'AI ട്രിപ്പ് പ്ലാനർ',
-        'nav-festivals': 'ടൂറിസ്റ്റ് പ്ലേസ് ഫൈൻഡർ', // Updated key value
-        'nav-login': 'ലോഗിൻ ചെയ്യുക',
-        'nav-logout': 'ലോഗ് ഔട്ട്',
-        'hero-title': 'അവിശ്വസനീയമായ ഇന്ത്യ പര്യവേക്ഷണം ചെയ്യുക',
-        'hero-subtitle': 'മഞ്ഞുമൂടിയ ഹിമാലയം മുതൽ ശാന്തമായ കായലുകൾ വരെ, ഊർജ്ജസ്വലമായ സംസ്കാരങ്ങളുടെയും പുരാതന പാരമ്പര്യങ്ങളുടെയും ആശ്വാസകരമായ പ്രകൃതിദൃശ്യങ്ങളുടെയും നാട് കണ്ടെത്തുക.',
-        'hero-cta': 'നിങ്ങളുടെ യാത്ര ഇപ്പോൾ പ്ലാൻ ചെയ്യുക',
-        'profile-title': 'നിങ്ങളുടെ പ്രൊഫൈൽ',
-        'profile-username-label': 'ഉപയോക്തൃനാമം',
-        'profile-email-label': 'ഇമെയിൽ',
-        'profile-dob-label': 'ജനന തീയതി',
-        'profile-state-label': 'സംസ്ഥാനം',
-        'profile-phone-label': 'ഫോൺ നമ്പർ',
-        'profile-not-provided': 'നൽകിയിട്ടില്ല',
-        'profile-fetch-error': 'നിങ്ങളുടെ പ്രൊഫൈൽ ലഭിച്ചില്ല. ദയവായി വീണ്ടും ലോഗിൻ ചെയ്യാൻ ശ്രമിക്കുക.',
-        'title-main': 'അവിശ്വസനീയമായ ഇന്ത്യ | പ്രകൃതിയും സംസ്കാരവും പര്യവേക്ഷണം ചെയ്യുക'
-      },
-      te: {
-        'lang-label': 'భాష:',
-        'app-title': 'అవిశ్వసనీయమైన భారతదేశం',
-        'nav-map': 'మ్యాప్',
-        'nav-planner': 'AI ట్రిప్ ప్లానర్',
-        'nav-festivals': 'పర్యాటక స్థల ఫైండర్', // Updated key value
-        'nav-login': 'లాగిన్',
-        'nav-logout': 'లాగ్ అవుట్',
-        'hero-title': 'అవిశ్వసనీయమైన భారతదేశాన్ని అన్వేషించండి',
-        'hero-subtitle': 'మంచుతో కప్పబడిన హిమాలయాల నుండి ప్రశాంతమైన బ్యాక్ వాటర్స్ వరకు, శక్తివంతమైన సంస్కృతులు, పురాతన సంప్రదాయాలు మరియు ఉత్కంఠభరితమైన ప్రకృతి దృశ్యాలు గల భూమిని కనుగొనండి.',
-        'hero-cta': 'మీ యాత్రను ఇప్పుడే ప్లాన్ చేయండి',
-        'profile-title': 'మీ ప్రొఫైల్',
-        'profile-username-label': 'యూజర్ పేరు',
-        'profile-email-label': 'ఇమెయిల్',
-        'profile-dob-label': 'పుట్టిన తేది',
-        'profile-state-label': 'రాష్ట్రం',
-        'profile-phone-label': 'ఫోన్ నంబర్',
-        'profile-not-provided': 'అందించబడలేదు',
-        'profile-fetch-error': 'మీ ప్రొఫైల్‌ను పొందamadık. దయచేసి మళ్లీ లాగిన్ చేయడానికి ప్రయత్నించండి.',
-        'title-main': 'అవిశ్వసనీయమైన భారతదేశం | ప్రకృతి & సంస్కృతిని అన్వేషించండి'
-      },
-      kn: {
-        'lang-label': 'ಭಾಷೆ:',
-        'app-title': 'ಅದ್ಭುತ ಭಾರತ',
-        'nav-map': 'ನಕ್ಷೆ',
-        'nav-planner': 'AI ಟ್ರಿಪ್ ಪ್ಲಾನರ್',
-        'nav-festivals': 'ಪ್ರವಾಸಿ ಸ್ಥಳ ಶೋಧಕ', // Updated key value
-        'nav-login': 'ಲಾಗಿನ್',
-        'nav-logout': 'ಲಾಗ್ ಔಟ್',
-        'hero-title': 'ಅದ್ಭುತ ಭಾರತವನ್ನು ಅನ್ವೇಷಿಸಿ',
-        'hero-subtitle': 'ಹಿಮದಿಂದ ಆವೃತವಾದ ಹಿಮಾಲಯದಿಂದ ಹಿಡಿದು ಪ್ರಶಾಂತವಾದ ಹಿನ್ನೀರಿನವರೆಗೆ, ರೋಮಾಂಚಕ ಸಂಸ್ಕೃತಿಗಳು, ಪ್ರಾಚೀನ ಸಂಪ್ರದಾಯಗಳು ಮತ್ತು ಉಸಿರುಕಟ್ಟುವ ಭೂದೃಶ್ಯಗಳ ನಾಡನ್ನು ಅನ್ವೇಷಿಸಿ.',
-        'hero-cta': 'ನಿಮ್ಮ ಪ್ರವಾಸವನ್ನು ಈಗಲೇ ಯೋಜಿಸಿ',
-        'profile-title': 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್',
-        'profile-username-label': 'ಬಳಕೆದಾರ ಹೆಸರು',
-        'profile-email-label': 'ಇಮೇಲ್',
-        'profile-dob-label': 'ಹುಟ್ತಿದ ದಿನ',
-        'profile-state-label': 'ರಾಜ್ಯ',
-        'profile-phone-label': 'ದೂರವಾಣಿ ಸಂಖ್ಯೆ',
-        'profile-not-provided': 'ಒದಗಿಸಲಾಗಿಲ್ಲ',
-        'profile-fetch-error': 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಅನ್ನು ತರಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಲಾಗಿನ್ ಮಾಡಲು ಪ್ರಯತ್ನಿಸಿ.',
-        'title-main': 'ಅದ್ಭುತ ಭಾರತ | ಪ್ರಕೃತಿ ಮತ್ತು ಸಂಸ್ಕೃತಿಯನ್ನು ಅನ್ವೇಷಿಸಿ'
-      },
-      bn: {
-        'lang-label': 'ভাষা:',
-        'app-title': 'অবিশ্বাস্য ভারত',
-        'nav-map': 'মানচিত্র',
-        'nav-planner': 'AI ট্রিপ প্ল্যানার',
-        'nav-festivals': 'পর্যটন স্থান ফাইন্ডার', // Updated key value
-        'nav-login': 'লগইন',
-        'nav-logout': 'লগ আউট',
-        'hero-title': 'অবিশ্বাস্য ভারত অন্বেষণ করুন',
-        'hero-subtitle': 'তুষার-আচ্ছাদিত হিমালয় থেকে শান্ত ব্যাকওয়াটার পর্যন্ত, প্রাণবন্ত সংস্কৃতি, প্রাচীন ঐতিহ্য এবং শ্বাসরুদ্ধকর প্রাকৃতিক দৃশ্যের দেশ আবিষ্কার করুন।',
-        'hero-cta': 'এখনই আপনার ভ্রমণের পরিকল্পনা করুন',
-        'profile-title': 'আপনার প্রোফাইল',
-        'profile-username-label': 'ব্যবহারকারীর নাম',
-        'profile-email-label': 'ইমেল',
-        'profile-dob-label': 'জন্ম তারিখ',
-        'profile-state-label': 'রাজ্য',
-        'profile-phone-label': 'ফোন নম্বর',
-        'profile-not-provided': 'দেওয়া হয়নি',
-        'profile-fetch-error': 'আপনার প্রোফাইল আনা যায়নি। অনুগ্রহ করে আবার লগইন করার চেষ্টা করুন।',
-        'title-main': 'অবিশ্বাস্য ভারত | প্রকৃতি ও সংস্কৃতি অন্বেষণ করুন'
-      },
-      mr: {
-        'lang-label': 'भाषा:',
-        'app-title': 'अतुल्य भारत',
-        'nav-map': 'नकाशा',
-        'nav-planner': 'AI ट्रिप प्लॅनर',
-        'nav-festivals': 'पर्यटन स्थळ शोधक', // Updated key value
-        'nav-login': 'लॉगिन',
-        'nav-logout': 'लॉग आउट',
-        'hero-title': 'अतुल्य भारताचा शोध घ्या',
-        'hero-subtitle': 'बर्फाच्छादित हिमालयापासून ते शांत बॅकवॉटर्सपर्यंत, चैतन्यशील संस्कृती, प्राचीन परंपरा आणि चित्तथरारक दृश्यांचा देश शोधा.',
-        'hero-cta': 'आपल्या ट्रिपची योजना आत्ताच करा',
-        'profile-title': 'तुमची प्रोफाइल',
-        'profile-username-label': 'वापरकर्ता नाव',
-        'profile-email-label': 'ईमेल',
-        'profile-dob-label': 'जन्म तारीख',
-        'profile-state-label': 'राज्य',
-        'profile-phone-label': 'फोन नंबर',
-        'profile-not-provided': 'प्रदान केलेले नाही',
-        'profile-fetch-error': 'तुमची प्रोफाइल आणता आली नाही. कृपया पुन्हा लॉग इन करण्याचा प्रयत्न करा.',
-        'title-main': 'अतुल्य भारत | निसर्ग आणि संस्कृतीचा शोध घ्या'
-      }
+       hi: {
+         'lang-label': 'भाषा:', 'app-title': 'अतुल्य भारत', 'nav-map': 'नक्शा', 'nav-planner': 'AI यात्रा योजनाकार',
+         'nav-festivals': 'पर्यटक स्थल खोजक', 'nav-login': 'लॉग इन करें', 'nav-logout': 'लॉग आउट',
+         'hero-title': 'अतुल्य भारत का अन्वेषण करें',
+         'hero-subtitle': 'बर्फ से ढके हिमालय से लेकर शांत बैकवाटर तक, जीवंत संस्कृतियों, प्राचीन परंपराओं और लुभावने परिदृश्यों की भूमि की खोज करें।',
+         'hero-cta': 'अपनी यात्रा की योजना अभी बनाएं', 'profile-title': 'आपकी प्रोफ़ाइल', 'profile-username-label': 'उपयोगकर्ता नाम',
+         'profile-email-label': 'ईमेल', 'profile-dob-label': 'जन्म की तारीख', 'profile-state-label': 'राज्य',
+         'profile-phone-label': 'फ़ोन नंबर', 'profile-not-provided': 'प्रदान नहीं किया गया',
+         'profile-fetch-error': 'आपकी प्रोफ़ाइल प्राप्त नहीं हो सकी। कृपया पुनः लॉग इन करने का प्रयास करें।',
+         'title-main': 'अतुल्य भारत | प्रकृति और संस्कृति का अन्वेषण करें'
+       },
+       ta: {
+         'lang-label': 'மொழி:', 'app-title': 'நம்பமுடியாத இந்தியா', 'nav-map': 'வரைபடம்', 'nav-planner': 'AI பயணத் திட்டமிடுபவர்',
+         'nav-festivals': 'சுற்றுலா இட கண்டுபிடிப்பாளர்', 'nav-login': 'உள்நுழைக', 'nav-logout': 'வெளியேறு',
+         'hero-title': 'நம்பமுடியாத இந்தியாவை ஆராயுங்கள்',
+         'hero-subtitle': 'பனி மூடிய இமயமலை முதல் அமைதியான உப்பங்கழிகள் வரை, துடிப்பான கலாச்சாரங்கள், பண்டைய மரபுகள் மற்றும் மூச்சடைக்கக்கூடிய пейзаஜ்கள் உள்ள நிலத்தைக் கண்டறியவும்.',
+         'hero-cta': 'உங்கள் பயணத்தை இப்போது திட்டமிடுங்கள்', 'profile-title': 'உங்கள் சுயவிவரம்', 'profile-username-label': 'பயனர் பெயர்',
+         'profile-email-label': 'மின்னஞ்சல்', 'profile-dob-label': 'பிறந்த தேதி', 'profile-state-label': 'மாநிலம்',
+         'profile-phone-label': 'தொலைபேசி எண்', 'profile-not-provided': 'வழங்கப்படவில்லை',
+         'profile-fetch-error': 'உங்கள் சுயவிவரத்தைப் பெற முடியவில்லை. தயவுசெய்து மீண்டும் உள்நுழைய முயற்சிக்கவும்.',
+         'title-main': 'நம்பமுடியாத இந்தியா | இயற்கை மற்றும் கலாச்சாரத்தை ஆராயுங்கள்'
+       },
+       ml: {
+         'lang-label': 'ഭാഷ:', 'app-title': 'അവിശ്വസനീയമായ ഇന്ത്യ', 'nav-map': 'മാപ്പ്', 'nav-planner': 'AI ട്രിപ്പ് പ്ലാനർ',
+         'nav-festivals': 'ടൂറിസ്റ്റ് പ്ലേസ് ഫൈൻഡർ', 'nav-login': 'ലോഗിൻ ചെയ്യുക', 'nav-logout': 'ലോഗ് ഔട്ട്',
+         'hero-title': 'അവിശ്വസനീയമായ ഇന്ത്യ പര്യവേക്ഷണം ചെയ്യുക',
+         'hero-subtitle': 'മഞ്ഞുമൂടിയ ഹിമാലയം മുതൽ ശാന്തമായ കായലുകൾ വരെ, ഊർജ്ജസ്വലമായ സംസ്കാരങ്ങളുടെയും പുരാതന പാരമ്പര്യങ്ങളുടെയും ആശ്വാസകരമായ പ്രകൃതിദൃശ്യങ്ങളുടെയും നാട് കണ്ടെത്തുക.',
+         'hero-cta': 'നിങ്ങളുടെ യാത്ര ഇപ്പോൾ പ്ലാൻ ചെയ്യുക', 'profile-title': 'നിങ്ങളുടെ പ്രൊഫൈൽ', 'profile-username-label': 'ഉപയോക്തൃനാമം',
+         'profile-email-label': 'ഇമെയിൽ', 'profile-dob-label': 'ജനന തീയതി', 'profile-state-label': 'സംസ്ഥാനം',
+         'profile-phone-label': 'ഫോൺ നമ്പർ', 'profile-not-provided': 'നൽകിയിട്ടില്ല',
+         'profile-fetch-error': 'നിങ്ങളുടെ പ്രൊഫൈൽ ലഭിച്ചില്ല. ദയവായി വീണ്ടും ലോഗിൻ ചെയ്യാൻ ശ്രമിക്കുക.',
+         'title-main': 'അവിശ്വസനീയമായ ഇന്ത്യ | പ്രകൃതിയും സംസ്കാരവും പര്യവേക്ഷണം ചെയ്യുക'
+       },
+       te: {
+         'lang-label': 'భాష:', 'app-title': 'అవిశ్వసనీయమైన భారతదేశం', 'nav-map': 'మ్యాప్', 'nav-planner': 'AI ట్రిప్ ప్లానర్',
+         'nav-festivals': 'పర్యాటక స్థల ఫైండర్', 'nav-login': 'లాగిన్', 'nav-logout': 'లాగ్ అవుట్',
+         'hero-title': 'అవిశ్వసనీయమైన భారతదేశాన్ని అన్వేషించండి',
+         'hero-subtitle': 'మంచుతో కప్పబడిన హిమాలయాల నుండి ప్రశాంతమైన బ్యాక్ వాటర్స్ వరకు, శక్తివంతమైన సంస్కృతులు, పురాతన సంప్రదాయాలు మరియు ఉత్కంఠభరితమైన ప్రకృతి దృశ్యాలు గల భూమిని కనుగొనండి.',
+         'hero-cta': 'మీ యాత్రను ఇప్పుడే ప్లాన్ చేయండి', 'profile-title': 'మీ ప్రొఫైల్', 'profile-username-label': 'యూజర్ పేరు',
+         'profile-email-label': 'ఇమెయిల్', 'profile-dob-label': 'పుట్టిన తేది', 'profile-state-label': 'రాష్ట్రం',
+         'profile-phone-label': 'ఫోన్ నంబర్', 'profile-not-provided': 'అందించబడలేదు',
+         'profile-fetch-error': 'మీ ప్రొఫైల్‌ను పొందamadık. దయచేసి మళ్లీ లాగిన్ చేయడానికి ప్రయత్నించండి.',
+         'title-main': 'అవిశ్వసనీయమైన భారతదేశం | ప్రకృతి & సంస్కృతిని అన్వేషించండి'
+       },
+       kn: {
+         'lang-label': 'ಭಾಷೆ:', 'app-title': 'ಅದ್ಭುತ ಭಾರತ', 'nav-map': 'ನಕ್ಷೆ', 'nav-planner': 'AI ಟ್ರಿಪ್ ಪ್ಲಾನರ್',
+         'nav-festivals': 'ಪ್ರವಾಸಿ ಸ್ಥಳ ಶೋಧಕ', 'nav-login': 'ಲಾಗಿನ್', 'nav-logout': 'ಲಾಗ್ ಔಟ್',
+         'hero-title': 'ಅದ್ಭುತ ಭಾರತವನ್ನು ಅನ್ವೇಷಿಸಿ',
+         'hero-subtitle': 'ಹಿಮದಿಂದ ಆವೃತವಾದ ಹಿಮಾಲಯದಿಂದ ಹಿಡಿದು ಪ್ರಶಾಂತವಾದ ಹಿನ್ನೀರಿನವರೆಗೆ, ರೋಮಾಂಚಕ ಸಂಸ್ಕೃತಿಗಳು, ಪ್ರಾಚೀನ ಸಂಪ್ರದಾಯಗಳು ಮತ್ತು ಉಸಿರುಕಟ್ಟುವ ಭೂದೃಶ್ಯಗಳ ನಾಡನ್ನು ಅನ್ವೇಷಿಸಿ.',
+         'hero-cta': 'ನಿಮ್ಮ ಪ್ರವಾಸವನ್ನು ಈಗಲೇ ಯೋಜಿಸಿ', 'profile-title': 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್', 'profile-username-label': 'ಬಳಕೆದಾರ ಹೆಸರು',
+         'profile-email-label': 'ಇಮೇಲ್', 'profile-dob-label': 'ಹುಟ್ತಿದ ದಿನ', 'profile-state-label': 'ರಾಜ್ಯ',
+         'profile-phone-label': 'ದೂರವಾಣಿ ಸಂಖ್ಯೆ', 'profile-not-provided': 'ಒದಗಿಸಲಾಗಿಲ್ಲ',
+         'profile-fetch-error': 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಅನ್ನು ತರಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಲಾಗಿನ್ ಮಾಡಲು ಪ್ರಯತ್ನಿಸಿ.',
+         'title-main': 'ಅದ್ಭುತ ಭಾರತ | ಪ್ರಕೃತಿ ಮತ್ತು ಸಂಸ್ಕೃತಿಯನ್ನು ಅನ್ವೇಷಿಸಿ'
+       },
+       bn: {
+         'lang-label': 'ভাষা:', 'app-title': 'অবিশ্বাস্য ভারত', 'nav-map': 'মানচিত্র', 'nav-planner': 'AI ট্রিপ প্ল্যানার',
+         'nav-festivals': 'পর্যটন স্থান ফাইন্ডার', 'nav-login': 'লগইন', 'nav-logout': 'লগ আউট',
+         'hero-title': 'অবিশ্বাস্য ভারত অন্বেষণ করুন',
+         'hero-subtitle': 'তুষার-আচ্ছাদিত হিমালয় থেকে শান্ত ব্যাকওয়াটার পর্যন্ত, প্রাণবন্ত সংস্কৃতি, প্রাচীন ঐতিহ্য এবং শ্বাসরুদ্ধকর প্রাকৃতিক দৃশ্যের দেশ আবিষ্কার করুন।',
+         'hero-cta': 'এখনই আপনার ভ্রমণের পরিকল্পনা করুন', 'profile-title': 'আপনার প্রোফাইল', 'profile-username-label': 'ব্যবহারকারীর নাম',
+         'profile-email-label': 'ইমেল', 'profile-dob-label': 'জন্ম তারিখ', 'profile-state-label': 'রাজ্য',
+         'profile-phone-label': 'ফোন নম্বর', 'profile-not-provided': 'দেওয়া হয়নি',
+         'profile-fetch-error': 'আপনার প্রোফাইল আনা যায়নি। অনুগ্রহ করে আবার লগইন করার চেষ্টা করুন।',
+         'title-main': 'অবিশ্বাস্য ভারত | প্রকৃতি ও সংস্কৃতি অন্বেষণ করুন'
+       },
+       mr: {
+         'lang-label': 'भाषा:', 'app-title': 'अतुल्य भारत', 'nav-map': 'नकाशा', 'nav-planner': 'AI ट्रिप प्लॅनर',
+         'nav-festivals': 'पर्यटन स्थळ शोधक', 'nav-login': 'लॉगिन', 'nav-logout': 'लॉग आउट',
+         'hero-title': 'अतुल्य भारताचा शोध घ्या',
+         'hero-subtitle': 'बर्फाच्छादित हिमालयापासून ते शांत बॅकवॉटर्सपर्यंत, चैतन्यशील संस्कृती, प्राचीन परंपरा आणि चित्तथरारक दृश्यांचा देश शोधा.',
+         'hero-cta': 'आपल्या ट्रिपची योजना आत्ताच करा', 'profile-title': 'तुमची प्रोफाइल', 'profile-username-label': 'वापरकर्ता नाव',
+         'profile-email-label': 'ईमेल', 'profile-dob-label': 'जन्म तारीख', 'profile-state-label': 'राज्य',
+         'profile-phone-label': 'फोन नंबर', 'profile-not-provided': 'प्रदान केलेले नाही',
+         'profile-fetch-error': 'तुमची प्रोफाइल आणता आली नाही. कृपया पुन्हा लॉग इन करण्याचा प्रयत्न करा.',
+         'title-main': 'अतुल्य भारत | निसर्ग आणि संस्कृतीचा शोध घ्या'
+       }
     };
 
     const updateContent = (lang) => {
         const currentTranslations = translations[lang];
-        if (!currentTranslations) return; // Exit if language not found
+        if (!currentTranslations) return;
 
         document.querySelectorAll('[data-i18n]').forEach(element => {
             const key = element.getAttribute('data-i18n');
@@ -495,7 +397,6 @@
             }
         });
 
-        // Update Title
         document.title = currentTranslations['title-main'];
     };
     // --- END TRANSLATION SCRIPT ---
@@ -503,7 +404,7 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       const token = localStorage.getItem("token");
-      const backendUrl = "https://toursim-dy8l.onrender.com"; // Ensure this points to your backend
+      const backendUrl = "http://localhost:5000"; // Ensure this points to your backend
 
       const userSection = document.getElementById("userSection");
       const profileIcon = document.getElementById("profile-icon");
@@ -514,47 +415,58 @@
       const closeProfileBtn = document.getElementById("close-profile-btn");
 
       const hamburger = document.getElementById("hamburger");
-      const nav = document.querySelector(".navbar nav"); // Target the nav element directly
+      const nav = document.querySelector(".navbar nav");
 
-      // --- Language Selector Logic ---
       const languageSelect = document.getElementById('language-select');
       updateContent('en'); // Set initial language
 
       languageSelect.addEventListener('change', (e) => {
           updateContent(e.target.value);
       });
-      // --- End Language Logic ---
 
       hamburger.addEventListener("click", () => {
-        nav.classList.toggle("open"); // Toggle 'open' class on the nav element
+        nav.classList.toggle("open");
+        hamburger.classList.toggle("active"); // Toggle active class on hamburger
       });
 
       if (token) {
         userSection.style.display = "none";
         profileIcon.style.display = "block";
-        logoutBtn.style.display = "inline-block";
+        logoutBtn.style.display = "inline-block"; // Make sure it's inline-block or block
       }
 
       logoutBtn.addEventListener("click", () => {
         localStorage.removeItem("token");
-        window.location.reload();
+        // --- CHANGE HERE ---
+        window.location.href = 'login.html'; // Redirect to login.html
+        // --- END CHANGE ---
       });
 
       async function openProfilePanel() {
         const currentLang = languageSelect.value;
-        const currentTranslations = translations[currentLang] || translations.en; // Fallback to English
+        const currentTranslations = translations[currentLang] || translations.en;
+
+        // Check if token exists before fetching
+        const currentToken = localStorage.getItem("token");
+        if (!currentToken) {
+            console.warn("No token found, cannot fetch profile.");
+            // Optionally redirect to login or show message
+            // window.location.href = 'login.html';
+            return;
+        }
+
 
         try {
           const response = await fetch(`${backendUrl}/api/auth/profile`, {
-            headers: { Authorization: `Bearer ${token}` },
+            // Use currentToken here
+            headers: { Authorization: `Bearer ${currentToken}` },
           });
           if (!response.ok) {
-            // Handle specific errors like 401 Unauthorized
             if (response.status === 401 || response.status === 403) {
                  console.warn("Unauthorized or Token expired. Logging out.");
                  localStorage.removeItem("token");
-                 window.location.reload(); // Reload to show login link
-                 return; // Stop execution
+                 window.location.href = 'login.html'; // Redirect on auth error
+                 return;
             }
             throw new Error(`Failed to fetch profile. Status: ${response.status}`);
           }
@@ -563,7 +475,6 @@
 
           document.getElementById("profile-username").textContent = user.username || 'N/A';
           document.getElementById("profile-email").textContent = user.email || 'N/A';
-          // Safely format date
           try {
               document.getElementById("profile-dob").textContent = user.dob ? new Date(user.dob).toLocaleDateString() : 'N/A';
           } catch (dateError) {
@@ -578,9 +489,9 @@
         } catch (error) {
           console.error("Error fetching profile:", error);
           alert(currentTranslations['profile-fetch-error']);
-          // Consider removing token only if the error suggests it's invalid
+          // Decide if removing token is appropriate here - maybe only for specific errors
           // localStorage.removeItem("token");
-          // window.location.reload();
+          // window.location.href = 'index.html';
         }
       }
 
@@ -596,5 +507,3 @@
   </script>
 </body>
 </html>
-
-
