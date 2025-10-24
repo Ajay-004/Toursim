@@ -61,7 +61,7 @@
     }
     .navbar nav a,
     .navbar nav button,
-    .navbar nav div { /* Include div for language selector alignment */
+    .navbar nav div {
       color: var(--text-color);
       text-decoration: none;
       margin-left: 1.5rem;
@@ -74,7 +74,7 @@
         align-items: center;
         gap: 5px;
         font-size: 0.8rem;
-        font-weight: 600; /* Match nav links */
+        font-weight: 600; 
         margin-left: 1.5rem; /* Match other nav items */
     }
     #language-select {
@@ -104,7 +104,7 @@
       font-weight: 600;
     }
 
-    /* Hamburger */
+    
     .hamburger {
       display: none;
       flex-direction: column;
@@ -116,9 +116,9 @@
       height: 3px;
       background: var(--primary-color);
       border-radius: 2px;
-      transition: all 0.3s ease-in-out; /* Add transition */
+      transition: all 0.3s ease-in-out;
     }
-    /* Active state for hamburger */
+   
     .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
     .hamburger.active span:nth-child(2) { opacity: 0; }
     .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
@@ -127,7 +127,7 @@
     /* Hero Section */
     .hero {
       background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
-        url("https://i.imgur.com/Bq5D5t8.jpeg") no-repeat center center;
+        url("tours.png") no-repeat center center;
       height: 100vh;
       background-size: cover;
       display: flex;
@@ -219,7 +219,7 @@
     <div class="hamburger" id="hamburger">
       <span></span> <span></span> <span></span>
     </div>
-    <nav> {/* Nav container */}
+    <nav>
       <div class="language-selector">
         <label for="language-select" data-i18n="lang-label">Language:</label>
         <select id="language-select">
