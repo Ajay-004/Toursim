@@ -339,7 +339,7 @@
                     if (response.ok) {
                         localStorage.setItem('token', result.token);
                         sessionStorage.setItem('justLoggedIn', 'true'); // Optional flag for welcome message on index page
-                        window.location.href = 'index.html';
+                        window.location.href = 'login.html';
                     } else {
                         loginMessage.textContent = result.message || currentTranslations['login-failed-default'];
                     }
