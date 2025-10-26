@@ -443,7 +443,7 @@
                 if (key === 'already-account') {
                      const linkKey = element.querySelector('a').getAttribute('data-i18n');
                      const textBeforeLink = currentTranslations['already-account'] + ' ';
-                     const linkHtml = `<a href="login.html" data-i18n="${linkKey}">${currentTranslations['link-login']}</a>`;
+                     const linkHtml = `<a href="index.html" data-i18n="${linkKey}">${currentTranslations['link-login']}</a>`;
                      element.innerHTML = textBeforeLink + linkHtml;
                 } else if (key === 'link-login') {
                     // Handled by 'already-account'
