@@ -1,85 +1,165 @@
 const express = require('express');
 const router = express.Router();
 
+
 /**
- * @desc    Cleans AI responses by removing citation markers and markdown code blocks.
- */
+ * @desc    Cleans AI responses by removing citation markers and extra text.
+ * @param   {string} text - The raw text from the Gemini response.
+ * @returns {string} The cleaned text.
+ */
 const cleanAIResponse = (text) => {
-    // Removes markdown backticks (```json ... ```) and citation markers [1]
-    return text.replace(/```json|```/g, '').replace(/\[\d+\]/g, '').trim();
+    // Removes citation markers like [1], [2], etc. and trims whitespace.
+    return text.replace(/\[\d+\]/g, '').trim();
 };
 
+/**
+ * @desc    Cleans and parses a JSON response from the AI.
+ * @param   {string} text - The raw text from the Gemini response.
+ * @returns {object} The parsed JSON object.
+ */
 const cleanAndParseJSON = (text) => {
-    const cleanedText = cleanAIResponse(text);
-    const jsonMatch = cleanedText.match(/\{[\s\S]*\}/); // Improved regex for multi-line JSON
-    if (!jsonMatch) {
-        throw new Error("No JSON object found in AI response.");
-    }
-    return JSON.parse(jsonMatch[0]);
+    const cleanedText = cleanAIResponse(text);
+    // Use a regular expression to find a JSON object within the string
+    const jsonMatch = cleanedText.match(/\{.*\}/s);
+    if (!jsonMatch) {
+        throw new Error("No JSON object found in AI response.");
+    }
+    return JSON.parse(jsonMatch[0]);
 };
 
-// --- Helper function for Gemini 2.0 Flash Lite ---
+
+// --- Helper function to call the Gemini API ---
 const callGeminiAPI = async (prompt, enableSearch = false) => {
-    if (!process.env.GEMINI_API_KEY) {
-        throw new Error('Gemini API key is not configured.');
-    }
-
-    const payload = { 
-        contents: [{ parts: [{ text: prompt }] }] 
-    };
-
-    // Use Google Search grounding if requested
-    if (enableSearch) {
-        payload.tools = [{ "google_search": {} }];
-    }
-
-    // TARGET MODEL: gemini-2.0-flash-lite
-    const MODEL_ID = "gemini-2.0-flash-lite";
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${process.env.GEMINI_API_KEY}`;
-
-    const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-        const errorBody = await response.json();
-        console.error("Gemini API Error:", errorBody);
-        throw new Error('Failed to get a response from the AI service.');
-    }
-
-    const data = await response.json();
-    
-    // Check if the model used a tool (like search) or returned direct text
-    return data.candidates[0].content.parts[0].text;
+    if (!process.env.GEMINI_API_KEY) {
+        throw new Error('Gemini API key is not configured.');
+    }
+    const payload = { contents: [{ parts: [{ text: prompt }] }] };
+    if (enableSearch) {
+        payload.tools = [{ "google_search": {} }];
+    }
+    const response = await fetch(
+        // <-- UPDATED: Changed the model name here
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }
+    );
+    if (!response.ok) {
+        const errorBody = await response.json();
+        console.error("Gemini API Error:", errorBody);
+        throw new Error('Failed to get a response from the AI service.');
+    }
+    const data = await response.json();
+    return data.candidates[0].content.parts[0].text;
 };
 
-// --- Routes remain the same logic, but now benefit from 2.0 Flash Lite's speed ---
 
+/**
+ * @route   POST /api/map/search
+ * @desc    Uses AI to find coordinates for any location in India.
+ */
 router.post('/search', async (req, res) => {
-    const { query } = req.body;
-    try {
-        const prompt = `
-            You are a geocoding assistant. Find coordinates for: "${query}" in India.
-            Response MUST be a single JSON object:
-            { "name": "...", "lat": ..., "lon": ... }
-            If not found: { "error": "Location not found" }
-        `;
-        const aiResponse = await callGeminiAPI(prompt, true);
-        const locationData = cleanAndParseJSON(aiResponse);
+    const { query } = req.body;
+    try {
+        const prompt = `
+            You are a geocoding assistant. A user is searching for a location in India: "${query}".
+            Find the geographic coordinates.
+            Your entire response MUST be a single JSON object. Do not add extra text or markdown.
+            If found: { "name": "...", "lat": ..., "lon": ... }
+            If not found: { "error": "Location not found" }
+        `;
+        const aiResponse = await callGeminiAPI(prompt, true);
+        const locationData = cleanAndParseJSON(aiResponse);
 
-        if (locationData.error) return res.json([]);
-        
-        res.json([{
-            ...locationData,
-            imageUrl: `https://placehold.co/600x400/cccccc/ffffff?text=${encodeURIComponent(locationData.name)}`
-        }]);
-    } catch (err) {
-        res.status(500).json({ message: "Error processing search." });
-    }
+        if (locationData.error) { return res.json([]); }
+        
+        const result = {
+            name: locationData.name,
+            lat: locationData.lat,
+            lon: locationData.lon,
+            imageUrl: `https://placehold.co/600x400/cccccc/ffffff?text=${encodeURIComponent(locationData.name)}`
+        };
+        res.json([result]);
+    } catch (err) {
+        console.error("Error in AI map search:", err.message);
+        res.status(500).json({ message: "Error processing your search." });
+    }
 });
 
-// ... (Other routes: /query, /history, /weather follow the same pattern)
 
-module.exports = router;
+/**
+ * @route   POST /api/map/query
+ * @desc    Uses AI to answer a specific question about a location.
+ */
+router.post('/query', async (req, res) => {
+    const { locationName, question, language } = req.body; 
+    
+    const prompt = `
+        You are a tour guide. A user is looking at "${locationName}" and asks: "${question}"
+        Provide a short, sweet, and easy-to-understand answer.
+        IMPORTANT: The user's language is "${language}". Respond ENTIRELY in that language.
+        Do not include citation markers like [1].
+    `;
+    try {
+        const rawAnswer = await callGeminiAPI(prompt, true);
+        const cleanedAnswer = cleanAIResponse(rawAnswer);
+        res.json({ answer: cleanedAnswer });
+    } catch (err) {
+        res.status(500).json({ message: "Could not get an answer from the AI." });
+    }
+});
+
+
+/**
+ * @route   POST /api/map/history
+ * @desc    Uses AI to generate a detailed history for a location.
+ */
+router.post('/history', async (req, res) => {
+    const { locationName, language } = req.body; 
+    
+    const prompt = `
+        You are a historian. Provide a brief, two-sentence summary of the history of ${locationName}.
+        IMPORTANT: The user's language is "${language}". Respond ENTIRELY in that language.
+        Do not include citation markers like [1].
+    `;
+    try {
+        const rawHistory = await callGeminiAPI(prompt, true);
+        const cleanedHistory = cleanAIResponse(rawHistory);
+        res.json({ history: cleanedHistory });
+    } catch (err) {
+        res.status(500).json({ message: "Could not generate history." });
+    }
+});
+
+
+/**
+ * @route   POST /api/map/weather
+ * @desc    Uses Gemini AI with Google Search to get the live weather.
+ */
+router.post('/weather', async (req, res) => {
+    const { locationName, language } = req.body; 
+
+    const prompt = `
+        You are a weather service assistant. 
+        Use your search tool to find the current, real-time weather for: "${locationName}".
+        Your entire response MUST be a single JSON object. Do not add extra text or markdown.
+        The JSON object should contain: "temp" (number), "description" (string), "icon" (string), and "tips" (array of 3 short strings).
+        IMPORTANT: The user's language is "${language}". The "description" and "tips" array MUST be in that language.
+        If you cannot find the weather, respond with: { "error": "Weather data not available" }
+    `;
+    try {
+        const aiResponse = await callGeminiAPI(prompt, true);
+        const weatherData = cleanAndParseJSON(aiResponse);
+        if (weatherData.error) {
+            return res.status(404).json({ message: weatherData.error });
+        }
+        res.json(weatherData);
+    } catch (err) {
+        res.status(500).json({ message: "Error processing weather request." });
+    }
+});
+
+
+module.exports = router; i want to use 2.0 flash lite in this code 
