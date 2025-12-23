@@ -39,7 +39,7 @@ const callGeminiAPI = async (prompt, enableSearch = false) => {
     }
     const response = await fetch(
         // <-- UPDATED: Changed the model name here
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`,
         {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -160,5 +160,6 @@ router.post('/weather', async (req, res) => {
         res.status(500).json({ message: "Error processing weather request." });
     }
 });
+
 
 module.exports = router;
